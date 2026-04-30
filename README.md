@@ -1,3 +1,12 @@
+---
+title: Election Guide
+emoji: 🗳️
+colorFrom: orange
+colorTo: green
+sdk: static
+pinned: false
+---
+
 <p align="center">
   <img src="https://img.shields.io/badge/🗳️_Navi-Indian_Election_Guide-ff9933?style=for-the-badge&labelColor=050810&color=ff9933" alt="Navi">
 </p>
