@@ -1,7 +1,7 @@
 ---
 title: Election Guide
 emoji: 🗳️
-colorFrom: orange
+colorFrom: yellow
 colorTo: green
 sdk: static
 pinned: false
