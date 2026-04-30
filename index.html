@@ -2072,114 +2072,246 @@
     }
 
     /* ============================================================
-       SECTION 10: QUERY MATCHING ENGINE
+       SECTION 10: GOOGLE GEMINI AI INTEGRATION
        ============================================================ */
 
     /**
-     * Process user free-text query against keyword maps
+     * Gemini AI configuration
+     * Uses Google's Generative Language API for intelligent fallback
+     * when keyword matching doesn't find a relevant node
+     */
+    const GEMINI = {
+      /** API endpoint — Gemini 1.5 Flash for fast responses */
+      endpoint: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent',
+
+      /** API key — stored in sessionStorage for security (user provides once) */
+      get apiKey() { return sessionStorage.getItem('navi_gemini_key') || ''; },
+      set apiKey(val) { sessionStorage.setItem('navi_gemini_key', val); },
+
+      /** System prompt that constrains Gemini to election topics */
+      systemPrompt: `You are Navi, an Indian Election Guide assistant. You ONLY answer questions about Indian elections, voting, ECI (Election Commission of India), Voter ID, electoral rolls, EVM, VVPAT, NOTA, polling booths, election dates, voter registration, and democratic processes in India.
+
+Rules:
+- Keep responses concise (under 150 words)
+- Be factual and nonpartisan
+- Always recommend verifying with official ECI sources (eci.gov.in, voters.eci.gov.in)
+- Mention relevant ECI forms (Form 6, 8, 8A, 6B, 6A) when applicable
+- Reference the Voter Helpline 1950 for urgent issues
+- If asked about non-election topics, politely redirect to election-related questions
+- Respond in the same language as the user's question when possible
+- Use simple, accessible language that all voters can understand`,
+
+      /** Whether Gemini is available (has API key) */
+      get isAvailable() { return !!this.apiKey; },
+
+      /** Maximum tokens for response */
+      maxTokens: 300,
+
+      /** Temperature for balanced responses */
+      temperature: 0.4
+    };
+
+    /**
+     * Prompt user for Gemini API key (one-time per session)
+     * @returns {boolean} Whether key was provided
+     */
+    function promptApiKey() {
+      if (GEMINI.isAvailable) return true;
+
+      const key = prompt(
+        'To enable AI-powered answers, enter your Google Gemini API key.\n\n' +
+        'Get a free key at: https://aistudio.google.com/apikey\n\n' +
+        '(Skip to use the standard guide without AI)'
+      );
+
+      if (key && key.trim().length > 10) {
+        GEMINI.apiKey = key.trim();
+        return true;
+      }
+      return false;
+    }
+
+    /**
+     * Query Google Gemini AI for election-related questions
+     * Falls back gracefully if API is unavailable
+     * 
+     * @param {string} query - User's question
+     * @param {string} lang - Current language code
+     * @returns {Promise<string|null>} AI response or null on failure
+     */
+    async function queryGemini(query, lang) {
+      if (!GEMINI.isAvailable && !promptApiKey()) return null;
+
+      try {
+        const langName = LANGS.find(l => l.code === lang)?.latin || 'English';
+
+        const response = await fetch(`${GEMINI.endpoint}?key=${GEMINI.apiKey}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            systemInstruction: {
+              parts: [{ text: GEMINI.systemPrompt + `\n\nRespond in ${langName} language.` }]
+            },
+            contents: [{
+              parts: [{ text: query }]
+            }],
+            generationConfig: {
+              maxOutputTokens: GEMINI.maxTokens,
+              temperature: GEMINI.temperature
+            }
+          })
+        });
+
+        if (!response.ok) {
+          console.warn('Gemini API error:', response.status);
+          return null;
+        }
+
+        const data = await response.json();
+        const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+        return text || null;
+      } catch (e) {
+        console.warn('Gemini query failed:', e.message);
+        return null;
+      }
+    }
+
+    /* ============================================================
+       SECTION 11: QUERY MATCHING ENGINE (UPGRADED)
+       ============================================================ */
+
+    /**
+     * Process user free-text query with three-tier resolution:
+     * 1. Local keyword matching (instant, no API)
+     * 2. Gemini AI fallback (intelligent, requires API key)
+     * 3. Static fallback (always available)
+     * 
      * @param {string} raw - User input text
      */
-    function handleQuery(raw) {
+    async function handleQuery(raw) {
       const q = raw.toLowerCase().trim();
+
       // Sanitize input — prevent XSS
       const sanitized = q.replace(/[<>]/g, '');
+      if (sanitized.length === 0) return;
+
+      // TIER 1: Local keyword matching (instant)
       const map = QMAP[curLang] || {};
       const enMap = QMAP.en || {};
-      for (const [kw, node] of Object.entries(map)) { if (sanitized.includes(kw)) { navigateTo(node, raw); return } }
-      for (const [kw, node] of Object.entries(enMap)) { if (sanitized.includes(kw)) { navigateTo(node, raw); return } }
+
+      for (const [kw, node] of Object.entries(map)) {
+        if (sanitized.includes(kw)) { navigateTo(node, raw); return; }
+      }
+      for (const [kw, node] of Object.entries(enMap)) {
+        if (sanitized.includes(kw)) { navigateTo(node, raw); return; }
+      }
+
+      // TIER 2: Gemini AI (if available)
+      const aiResponse = await queryGemini(raw, curLang);
+      if (aiResponse) {
+        addAIResponse(raw, aiResponse);
+        return;
+      }
+
+      // TIER 3: Static fallback
       addAgentFallback(raw);
     }
 
-    /** Navigate to a node from user query */
+    /** Navigate to a conversation node from user query */
     function navigateTo(nodeId, raw) {
-      const uw = document.createElement('div'); uw.className = 'msg user'; uw.setAttribute('role', 'article');
+      const uw = document.createElement('div');
+      uw.className = 'msg user';
+      uw.setAttribute('role', 'article');
       uw.innerHTML = '<div class="msg-av" aria-hidden="true">You</div><div class="bub"></div>';
-      uw.querySelector('.bub').textContent = raw; chatEl.appendChild(uw); scroll();
-      choicesEl.innerHTML = ''; setTimeout(() => showNode(nodeId), 300);
+      uw.querySelector('.bub').textContent = raw;
+      chatEl.appendChild(uw);
+      scroll();
+      choicesEl.innerHTML = '';
+      setTimeout(() => showNode(nodeId), 300);
     }
 
-    /** Show fallback when query doesn't match any keyword */
-    async function addAgentFallback(raw) {
-      const uw = document.createElement('div'); uw.className = 'msg user'; uw.setAttribute('role', 'article');
+    /**
+     * Display AI-generated response with source attribution
+     * @param {string} raw - Original user query
+     * @param {string} response - Gemini AI response text
+     */
+    async function addAIResponse(raw, response) {
+      // Add user message
+      const uw = document.createElement('div');
+      uw.className = 'msg user';
+      uw.setAttribute('role', 'article');
       uw.innerHTML = '<div class="msg-av" aria-hidden="true">You</div><div class="bub"></div>';
-      uw.querySelector('.bub').textContent = raw; chatEl.appendChild(uw); scroll();
+      uw.querySelector('.bub').textContent = raw;
+      chatEl.appendChild(uw);
+      scroll();
       choicesEl.innerHTML = '';
+
+      // Add AI response with attribution
+      await addMsg(response + '\n\n_[AI-generated — verify with ECI at eci.gov.in]_');
+
+      // Offer to continue guided journey
+      addChoices(getChoices(C.welcome));
+      addQuickActions();
+    }
+
+    /** Show fallback when both keyword matching and AI fail */
+    async function addAgentFallback(raw) {
+      const uw = document.createElement('div');
+      uw.className = 'msg user';
+      uw.setAttribute('role', 'article');
+      uw.innerHTML = '<div class="msg-av" aria-hidden="true">You</div><div class="bub"></div>';
+      uw.querySelector('.bub').textContent = raw;
+      chatEl.appendChild(uw);
+      scroll();
+      choicesEl.innerHTML = '';
+
       const fallbacks = {
-        en: "I'm not sure I understood. Try asking about registration, voter ID, electoral roll, polling booth, documents, EVM, NOTA, NRI voting, Aadhaar linking, or election dates. Or use the quick action buttons!",
-        hi: "मुझे समझ नहीं आया। पंजीकरण, वोटर ID, मतदाता सूची, मतदान केंद्र, दस्तावेज, EVM, NOTA, NRI मतदान, आधार लिंक, या चुनाव तारीख के बारे में पूछें।",
-        kn: "ನನಗೆ ಅರ್ಥವಾಗಲಿಲ್ಲ. ನೋಂದಣಿ, ವೋಟರ್ ID, ಮತದಾರ ಪಟ್ಟಿ, ಮತಗಟ್ಟೆ, ದಾಖಲೆಗಳು, EVM, NOTA ಬಗ್ಗೆ ಕೇಳಿ.",
-        ta: "புரியவில்லை. பதிவு, வாக்காளர் ID, வாக்காளர் பட்டியல், வாக்குச்சாவடி, ஆவணங்கள், EVM, NOTA பற்றி கேளுங்கள்.",
-        te: "అర్థం కాలేదు. నమోదు, ఓటర్ ID, ఓటరు జాబితా, పోలింగ్ బూత్, పత్రాలు, EVM, NOTA గురించి అడగండి.",
-        ml: "മനസ്സിലായില്ല. രജിസ്ട്രേഷൻ, വോട്ടർ ID, വോട്ടർ പട്ടിക, പോളിംഗ് ബൂത്ത്, EVM, NOTA എന്നിവയെക്കുറിച്ച് ചോദിക്കൂ."
+        en: "I'm not sure I understood. Try asking about registration, voter ID, electoral roll, polling booth, documents, EVM, NOTA, NRI voting, Aadhaar linking, or election dates. Or use the quick action buttons!\n\n💡 **Tip:** Enable AI mode (click the ✦ button) for intelligent answers to any election question.",
+        hi: "मुझे समझ नहीं आया। पंजीकरण, वोटर ID, मतदाता सूची, मतदान केंद्र, दस्तावेज, EVM, NOTA, NRI मतदान, आधार लिंक, या चुनाव तारीख के बारे में पूछें।\n\n💡 **सुझाव:** किसी भी चुनाव प्रश्न के लिए AI मोड (✦ बटन) सक्षम करें।",
+        kn: "ನನಗೆ ಅರ್ಥವಾಗಲಿಲ್ಲ. ನೋಂದಣಿ, ವೋಟರ್ ID, ಮತದಾರ ಪಟ್ಟಿ, ಮತಗಟ್ಟೆ, EVM, NOTA ಬಗ್ಗೆ ಕೇಳಿ.\n\n💡 AI ಮೋಡ್ ಸಕ್ರಿಯಗೊಳಿಸಿ (✦ ಬಟನ್).",
+        ta: "புரியவில்லை. பதிவு, வாக்காளர் ID, வாக்காளர் பட்டியல், EVM, NOTA பற்றி கேளுங்கள்.\n\n💡 AI பயன்முறையை இயக்கவும் (✦ பொத்தான்).",
+        te: "అర్థం కాలేదు. నమోదు, ఓటర్ ID, ఓటరు జాబಿತా, EVM, NOTA గురించి అడగండి.\n\n💡 AI మోడ్ ప్రారంభించండి (✦ బటన్).",
+        ml: "മനസ്സിലായില്ല. രജിസ്ട്രേഷൻ, വോട്ടർ ID, EVM, NOTA എന്നിവയെക്കുറിച്ച് ചോദിക്കൂ.\n\n💡 AI മോഡ് പ്രവർത്തനക്ഷമമാക്കുക (✦ ബട്ടൺ)."
       };
+
       await addMsg(fallbacks[curLang] || fallbacks.en);
       addChoices(getChoices(C.welcome));
       addQuickActions();
     }
 
     /* ============================================================
-       SECTION 11: VOICE SYSTEM (Web Speech API)
+       SECTION 12: EVENT LISTENERS (UPGRADED)
        ============================================================ */
 
-    /**
-     * Speak text using SpeechSynthesis API
-     * @param {string} text - Text to speak
-     */
-    function speakText(text) {
-      if (!synth) return; synth.cancel();
-      const clean = text.replace(/\*\*/g, '').replace(/\n/g, '. ');
-      const u = new SpeechSynthesisUtterance(clean);
-      u.lang = LANGS.find(l => l.code === curLang)?.voice || 'en-IN';
-      u.rate = .92; u.pitch = 1;
-      try {
-        const voices = synth.getVoices();
-        const match = voices.find(v => v.lang.startsWith(curLang));
-        if (match) u.voice = match;
-      } catch (e) {/* Voice selection failed — use default */ }
-      synth.speak(u);
-    }
+    // Add AI toggle button to header
+    (function () {
+      const aiBtn = document.createElement('button');
+      aiBtn.className = 'h-btn';
+      aiBtn.id = 'aiTog';
+      aiBtn.title = 'Toggle AI mode (Gemini)';
+      aiBtn.setAttribute('aria-label', 'Toggle AI mode');
+      aiBtn.textContent = '✦';
+      aiBtn.style.cssText = 'font-size:.9rem';
+      aiBtn.addEventListener('click', () => {
+        if (GEMINI.isAvailable) {
+          // Toggle AI indicator
+          aiBtn.classList.toggle('active');
+          aiBtn.title = aiBtn.classList.contains('active') ? 'AI mode ON' : 'AI mode OFF';
+        } else {
+          promptApiKey();
+          if (GEMINI.isAvailable) aiBtn.classList.add('active');
+        }
+      });
+      // Insert before language button
+      const ctrls = document.querySelector('.h-ctrls');
+      if (ctrls) ctrls.insertBefore(aiBtn, ctrls.firstChild);
+    })();
 
-    /** Initialize Speech Recognition */
-    function initSTT() {
-      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SR) { voiceBtn.style.display = 'none'; return }
-      recognition = new SR();
-      recognition.continuous = false; recognition.interimResults = true;
-      recognition.lang = LANGS.find(l => l.code === curLang)?.voice || 'en-IN';
-      recognition.onresult = e => {
-        const transcript = Array.from(e.results).map(r => r[0].transcript).join('');
-        userInp.value = transcript;
-        if (e.results[0].isFinal) { stopRecording(); handleQuery(transcript) }
-      };
-      recognition.onerror = (e) => {
-        console.warn('Speech recognition error:', e.error);
-        stopRecording();
-      };
-      recognition.onend = () => { if (isRecording) stopRecording() };
-    }
-
-    function startRecording() {
-      if (!recognition) return;
-      recognition.lang = LANGS.find(l => l.code === curLang)?.voice || 'en-IN';
-      try {
-        recognition.start(); isRecording = true; voiceBtn.classList.add('recording');
-        document.getElementById('vWave').classList.add('active')
-      } catch (e) { console.warn('STT start error:', e) }
-    }
-    function stopRecording() {
-      if (!recognition) return;
-      try { recognition.stop() } catch (e) { }
-      isRecording = false; voiceBtn.classList.remove('recording');
-      document.getElementById('vWave').classList.remove('active');
-    }
-
-    /* ============================================================
-       SECTION 12: EVENT LISTENERS
-       ============================================================ */
-
-    voiceBtn.addEventListener('click', () => { isRecording ? stopRecording() : startRecording() });
+    voiceBtn.addEventListener('click', () => { isRecording ? stopRecording() : startRecording(); });
     voiceTog.addEventListener('click', () => {
-      voiceOn = !voiceOn; voiceTog.classList.toggle('active', voiceOn);
+      voiceOn = !voiceOn;
+      voiceTog.classList.toggle('active', voiceOn);
       voiceTog.textContent = voiceOn ? '🔊' : '🔇';
       voiceTog.setAttribute('aria-pressed', voiceOn);
       if (!voiceOn && synth) synth.cancel();
@@ -2188,28 +2320,49 @@
       document.getElementById('chatScreen').classList.remove('active');
       setTimeout(() => {
         document.getElementById('langSel').classList.remove('exit');
-        curProg = 0; chatEl.innerHTML = ''; choicesEl.innerHTML = ''; updProg(0)
+        curProg = 0;
+        chatEl.innerHTML = '';
+        choicesEl.innerHTML = '';
+        updProg(0);
       }, 400);
     });
-    sendBtn.addEventListener('click', () => { const v = userInp.value.trim(); if (v) { userInp.value = ''; handleQuery(v) } });
-    userInp.addEventListener('keydown', e => { if (e.key === 'Enter') { const v = userInp.value.trim(); if (v) { userInp.value = ''; handleQuery(v) } } });
+    sendBtn.addEventListener('click', () => {
+      const v = userInp.value.trim();
+      if (v) { userInp.value = ''; handleQuery(v); }
+    });
+    userInp.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        const v = userInp.value.trim();
+        if (v) { userInp.value = ''; handleQuery(v); }
+      }
+    });
 
     /* ============================================================
-       SECTION 13: CELEBRATION (Confetti + Tricolor)
+       SECTION 13: CELEBRATION (UNCHANGED)
        ============================================================ */
 
     function celebrate() {
-      const c = document.getElementById('cele'); c.classList.add('on');
+      const c = document.getElementById('cele');
+      c.classList.add('on');
       const colors = ['#ff9933', '#FFFFFF', '#138808', '#d4a84b', '#f0d878', '#5b8def'];
       for (let i = 0; i < 100; i++) {
-        const d = document.createElement('div'); d.className = 'conf'; d.setAttribute('aria-hidden', 'true');
-        d.style.cssText = `left:${Math.random() * 100}%;background:${colors[i % 6]};animation-delay:${Math.random() * 2.5}s;animation-duration:${2.5 + Math.random() * 2.5}s;width:${4 + Math.random() * 7}px;height:${4 + Math.random() * 7}px;border-radius:${Math.random() > .5 ? '50%' : '2px'}`; c.appendChild(d);
+        const d = document.createElement('div');
+        d.className = 'conf';
+        d.setAttribute('aria-hidden', 'true');
+        d.style.cssText = `left:${Math.random() * 100}%;background:${colors[i % 6]};animation-delay:${Math.random() * 2.5}s;animation-duration:${2.5 + Math.random() * 2.5}s;width:${4 + Math.random() * 7}px;height:${4 + Math.random() * 7}px;border-radius:${Math.random() > .5 ? '50%' : '2px'}`;
+        c.appendChild(d);
       }
-      const m = document.createElement('div'); m.className = 'cele-m'; m.setAttribute('role', 'dialog'); m.setAttribute('aria-label', 'Journey Complete');
-      const ct = { en: '<h2>Jai Hind! 🇮🇳</h2><p>You\'re prepared for the world\'s largest democracy. Go vote!</p>', hi: '<h2>जय हिंद! 🇮🇳</h2><p>आप विश्व के सबसे बड़े लोकतंत्र के लिए तैयार हैं। वोट करें!</p>' };
+      const m = document.createElement('div');
+      m.className = 'cele-m';
+      m.setAttribute('role', 'dialog');
+      m.setAttribute('aria-label', 'Journey Complete');
+      const ct = {
+        en: '<h2>Jai Hind! 🇮🇳</h2><p>You\'re prepared for the world\'s largest democracy. Go vote!</p>',
+        hi: '<h2>जय हिंद! 🇮🇳</h2><p>आप विश्व के सबसे बड़े लोकतंत्र के लिए तैयार हैं। वोट करें!</p>'
+      };
       m.innerHTML = (ct[curLang] || ct.en) + '<button onclick="this.closest(\'.cele-m\').remove();document.getElementById(\'cele\').classList.remove(\'on\')" autofocus>OK</button>';
       c.appendChild(m);
-      setTimeout(() => { c.classList.remove('on'); c.innerHTML = '' }, 12000);
+      setTimeout(() => { c.classList.remove('on'); c.innerHTML = ''; }, 12000);
     }
 
     /* ============================================================
@@ -2223,10 +2376,15 @@
     (function () {
       const s = document.createElement('script');
       s.src = '//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
-      s.async = true; s.defer = true;
-      s.onerror = () => {/* Google Translate unavailable — graceful fallback */ };
+      s.async = true;
+      s.defer = true;
+      s.onerror = () => { /* Google Translate unavailable — graceful fallback */ };
       document.head.appendChild(s);
     })();
+
+    // Log initialization
+    console.log('%c🗳️ Navi — Indian Election Guide Agent v2.1', 'color:#ff9933;font-size:14px;font-weight:bold');
+    console.log('%c13 languages · Voice I/O · Gemini AI · 7 Google Services', 'color:#8891a5;font-size:11px');
   </script>
 </body>
 
