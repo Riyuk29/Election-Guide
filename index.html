@@ -1,2391 +1,1301 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-  <meta name="description"
-    content="Navi — Interactive Indian Election Guide Agent. Nonpartisan, multilingual, voice-enabled assistant for Indian voters.">
-  <meta name="theme-color" content="#050810">
-  <meta http-equiv="X-Content-Security-Policy" content="upgrade-insecure-requests">
-  <title>Navi — Indian Election Guide Agent</title>
-
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400&family=Source+Serif+4:opsz,wght@8..60,300;8..60,400&family=Noto+Sans+Devanagari:wght@400;600;700&family=Noto+Sans+Tamil:wght@400;600&family=Noto+Sans+Kannada:wght@400;600&family=Noto+Sans+Telugu:wght@400;600&family=Noto+Sans+Bengali:wght@400;600&family=Noto+Sans+Gujarati:wght@400;600&family=Noto+Sans+Malayalam:wght@400;600&family=Noto+Sans+Gurmukhi:wght@400;600&family=Noto+Sans+Oriya:wght@400;600&display=swap"
-    rel="stylesheet">
-
-  <!-- Google Translate Element (loaded dynamically) -->
-  <style>
-    /* ============================================================
-   NAVI — Indian Election Guide Agent
-   Aesthetic: Dark cinematic with saffron-gold accents
-   ============================================================ */
-    *,
-    *::before,
-    *::after {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box
-    }
-
-    :root {
-      --bg: #050810;
-      --bg2: #0a0e1a;
-      --surface: #111827;
-      --card: #161d2e;
-      --card-h: #1e2740;
-      --saffron: #ff9933;
-      --saffron-l: #ffb366;
-      --saffron-dim: rgba(255, 153, 51, .1);
-      --gold: #d4a84b;
-      --gold-l: #f0d878;
-      --gold-dim: rgba(212, 168, 75, .08);
-      --green: #138808;
-      --green-l: #25c41b;
-      --green-dim: rgba(19, 136, 8, .1);
-      --white-accent: #e8e8e8;
-      --blue: #5b8def;
-      --blue-dim: rgba(91, 141, 239, .1);
-      --text: #eef0f5;
-      --text2: #8891a5;
-      --text3: #3e4558;
-      --border: rgba(255, 255, 255, .05);
-      --border-s: rgba(255, 153, 51, .15);
-      --fd: 'Syne', sans-serif;
-      --fb: 'Source Serif 4', serif;
-      --fm: 'DM Mono', monospace;
-      --ease: cubic-bezier(.4, 0, .2, 1);
-      --r: 14px;
-      --r-sm: 10px
-    }
-
-    html {
-      scroll-behavior: smooth
-    }
-
-    html,
-    body {
-      height: 100%;
-      overflow: hidden
-    }
-
-    body {
-      font-family: var(--fb);
-      background: var(--bg);
-      color: var(--text);
-      -webkit-font-smoothing: antialiased
-    }
-
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background: radial-gradient(ellipse at 20% 0%, rgba(40, 20, 5, .3) 0%, transparent 50%), radial-gradient(ellipse at 80% 100%, rgba(10, 30, 15, .2) 0%, transparent 50%), radial-gradient(ellipse at 50% 50%, rgba(10, 15, 30, .15) 0%, transparent 60%);
-      pointer-events: none;
-      z-index: 0
-    }
-
-    /* Skip Navigation — Accessibility */
-    .skip-link {
-      position: absolute;
-      top: -100px;
-      left: 16px;
-      z-index: 9999;
-      padding: 12px 20px;
-      background: var(--saffron);
-      color: var(--bg);
-      font-family: var(--fm);
-      font-size: .8rem;
-      border-radius: var(--r-sm);
-      text-decoration: none;
-      transition: top .3s
-    }
-
-    .skip-link:focus {
-      top: 16px
-    }
-
-    #particles {
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      pointer-events: none
-    }
-
-    /* ===== LANGUAGE SELECTOR ===== */
-    #langSel {
-      position: fixed;
-      inset: 0;
-      z-index: 100;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      transition: all .9s var(--ease);
-      overflow-y: auto
-    }
-
-    #langSel.exit {
-      opacity: 0;
-      transform: scale(1.1);
-      pointer-events: none
-    }
-
-    .ls-orb {
-      position: relative;
-      width: 120px;
-      height: 120px;
-      margin-bottom: 28px;
-      opacity: 0;
-      animation: fadeUp .7s .2s var(--ease) forwards
-    }
-
-    .ls-orb-c {
-      position: absolute;
-      inset: 24px;
-      border-radius: 50%;
-      background: radial-gradient(circle at 35% 35%, var(--saffron-l), var(--saffron) 50%, #b35900);
-      box-shadow: 0 0 40px rgba(255, 153, 51, .35), 0 0 80px rgba(255, 153, 51, .1);
-      animation: breathe 4s ease-in-out infinite
-    }
-
-    .ls-orb-r {
-      position: absolute;
-      border-radius: 50%;
-      border: 1.5px solid transparent
-    }
-
-    .ls-orb-r1 {
-      inset: 4px;
-      border-top-color: rgba(255, 153, 51, .35);
-      animation: spin 10s linear infinite
-    }
-
-    .ls-orb-r2 {
-      inset: 14px;
-      border-bottom-color: rgba(212, 168, 75, .25);
-      animation: spin 14s linear infinite reverse
-    }
-
-    @keyframes breathe {
-
-      0%,
-      100% {
-        transform: scale(1)
-      }
-
-      50% {
-        transform: scale(1.08)
-      }
-    }
-
-    @keyframes spin {
-      to {
-        transform: rotate(360deg)
-      }
-    }
-
-    .ls-title {
-      font-family: var(--fd);
-      font-size: clamp(2rem, 5vw, 3rem);
-      font-weight: 800;
-      margin-bottom: 6px;
-      opacity: 0;
-      animation: fadeUp .7s .35s var(--ease) forwards
-    }
-
-    .ls-sub {
-      color: var(--text2);
-      font-size: .95rem;
-      margin-bottom: 32px;
-      font-weight: 300;
-      opacity: 0;
-      animation: fadeUp .7s .5s var(--ease) forwards;
-      text-align: center
-    }
-
-    .ls-label {
-      font-family: var(--fm);
-      font-size: .65rem;
-      letter-spacing: .2em;
-      text-transform: uppercase;
-      color: var(--saffron);
-      margin-bottom: 16px;
-      opacity: 0;
-      animation: fadeUp .7s .6s var(--ease) forwards
-    }
-
-    .ls-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 10px;
-      max-width: 740px;
-      width: 100%;
-      opacity: 0;
-      animation: fadeUp .7s .7s var(--ease) forwards
-    }
-
-    .ls-card {
-      padding: 14px 10px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--r-sm);
-      cursor: pointer;
-      text-align: center;
-      transition: all .3s var(--ease);
-      position: relative;
-      overflow: hidden
-    }
-
-    .ls-card::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, rgba(255, 153, 51, .05), transparent);
-      opacity: 0;
-      transition: opacity .3s
-    }
-
-    .ls-card:hover,
-    .ls-card:focus {
-      border-color: var(--border-s);
-      transform: translateY(-3px);
-      box-shadow: 0 6px 24px rgba(255, 153, 51, .08);
-      outline: none
-    }
-
-    .ls-card:hover::before,
-    .ls-card:focus::before {
-      opacity: 1
-    }
-
-    .ls-card .native {
-      font-size: 1.05rem;
-      font-weight: 600;
-      line-height: 1.4;
-      display: block;
-      margin-bottom: 2px
-    }
-
-    .ls-card .latin {
-      font-family: var(--fm);
-      font-size: .6rem;
-      color: var(--text3);
-      letter-spacing: .05em;
-      text-transform: uppercase
-    }
-
-    /* Google Translate Bar */
-    .gtranslate-bar {
-      position: absolute;
-      top: 16px;
-      right: 16px;
-      z-index: 101;
-      opacity: 0;
-      animation: fadeUp .7s 1.2s var(--ease) forwards
-    }
-
-    .gtranslate-bar select {
-      background: var(--surface);
-      color: var(--text2);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 6px 10px;
-      font-family: var(--fm);
-      font-size: .7rem;
-      cursor: pointer
-    }
-
-    #google_translate_element {
-      display: none
-    }
-
-    .ls-disclaimer {
-      position: fixed;
-      bottom: 20px;
-      font-family: var(--fm);
-      font-size: .55rem;
-      color: var(--text3);
-      letter-spacing: .06em;
-      text-align: center;
-      padding: 0 16px;
-      opacity: 0;
-      animation: fadeUp .7s 1s var(--ease) forwards
-    }
-
-    @keyframes fadeUp {
-      from {
-        opacity: 0;
-        transform: translateY(20px)
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0)
-      }
-    }
-
-    /* ===== CHAT SCREEN ===== */
-    #chatScreen {
-      position: fixed;
-      inset: 0;
-      z-index: 50;
-      display: grid;
-      grid-template-rows: auto auto 1fr auto auto;
-      opacity: 0;
-      transform: scale(.95);
-      pointer-events: none;
-      transition: all .8s var(--ease)
-    }
-
-    #chatScreen.active {
-      opacity: 1;
-      transform: scale(1);
-      pointer-events: all
-    }
-
-    /* HEADER */
-    .hdr {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 20px;
-      background: rgba(5, 8, 16, .88);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
-      border-bottom: 1px solid var(--border);
-      z-index: 10
-    }
-
-    .h-orb {
-      position: relative;
-      width: 38px;
-      height: 38px;
-      flex-shrink: 0
-    }
-
-    .h-orb-c {
-      position: absolute;
-      inset: 5px;
-      border-radius: 50%;
-      background: radial-gradient(circle at 35% 35%, var(--saffron-l), var(--saffron) 55%, #b35900);
-      box-shadow: 0 0 14px rgba(255, 153, 51, .35);
-      animation: breathe 3.5s ease-in-out infinite
-    }
-
-    .h-orb-r1 {
-      position: absolute;
-      inset: 0;
-      border-radius: 50%;
-      border-top: 1.5px solid rgba(255, 153, 51, .3);
-      border-right: 1.5px solid rgba(255, 153, 51, .05);
-      animation: spin 8s linear infinite
-    }
-
-    .h-orb-r2 {
-      position: absolute;
-      inset: 3px;
-      border-radius: 50%;
-      border-bottom: 1.5px solid rgba(212, 168, 75, .2);
-      border-left: 1.5px solid rgba(212, 168, 75, .03);
-      animation: spin 12s linear infinite reverse
-    }
-
-    .h-orb.thinking .h-orb-c {
-      animation-duration: 1s;
-      box-shadow: 0 0 22px rgba(255, 153, 51, .6)
-    }
-
-    .h-info {
-      flex: 1;
-      min-width: 0
-    }
-
-    .h-name {
-      font-family: var(--fd);
-      font-size: .95rem;
-      font-weight: 700
-    }
-
-    .h-status {
-      font-family: var(--fm);
-      font-size: .6rem;
-      color: var(--text3);
-      letter-spacing: .04em;
-      transition: color .3s
-    }
-
-    .h-status.on {
-      color: var(--saffron)
-    }
-
-    .h-ctrls {
-      display: flex;
-      align-items: center;
-      gap: 6px
-    }
-
-    .h-btn {
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
-      border: 1px solid var(--border);
-      background: transparent;
-      color: var(--text3);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: all .25s var(--ease);
-      font-size: .8rem
-    }
-
-    .h-btn:hover,
-    .h-btn:focus {
-      border-color: var(--border-s);
-      color: var(--saffron);
-      background: var(--saffron-dim);
-      outline: none
-    }
-
-    .h-btn.active {
-      border-color: var(--saffron);
-      color: var(--saffron);
-      background: var(--saffron-dim)
-    }
-
-    .h-btn.lang-btn {
-      font-size: .65rem;
-      font-family: var(--fm);
-      font-weight: 600;
-      width: auto;
-      padding: 0 10px;
-      border-radius: 16px;
-      letter-spacing: .03em
-    }
-
-    .h-ring {
-      position: relative;
-      width: 36px;
-      height: 36px;
-      flex-shrink: 0
-    }
-
-    .h-ring svg {
-      width: 100%;
-      height: 100%
-    }
-
-    .h-ring-bg {
-      fill: none;
-      stroke: rgba(255, 255, 255, .04);
-      stroke-width: 3
-    }
-
-    .h-ring-f {
-      fill: none;
-      stroke: var(--saffron);
-      stroke-width: 3;
-      stroke-linecap: round;
-      stroke-dasharray: 94;
-      stroke-dashoffset: 94;
-      transition: stroke-dashoffset .8s var(--ease)
-    }
-
-    .h-ring-t {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: var(--fm);
-      font-size: .5rem;
-      font-weight: 700;
-      color: var(--saffron)
-    }
-
-    /* JOURNEY BAR */
-    .j-bar {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 3px;
-      padding: 10px 16px;
-      background: var(--bg2);
-      border-bottom: 1px solid var(--border)
-    }
-
-    .j-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--card);
-      border: 1.5px solid rgba(255, 255, 255, .06);
-      transition: all .5s var(--ease);
-      position: relative
-    }
-
-    .j-dot.active {
-      background: var(--saffron);
-      border-color: var(--saffron);
-      box-shadow: 0 0 8px rgba(255, 153, 51, .3)
-    }
-
-    .j-dot.done {
-      background: var(--green-l);
-      border-color: var(--green)
-    }
-
-    .j-dot::after {
-      content: attr(data-l);
-      position: absolute;
-      top: 12px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-family: var(--fm);
-      font-size: .45rem;
-      color: var(--text3);
-      white-space: nowrap;
-      opacity: 0;
-      transition: opacity .3s
-    }
-
-    .j-dot.active::after,
-    .j-dot:hover::after {
-      opacity: 1
-    }
-
-    .j-line {
-      width: 16px;
-      height: 2px;
-      background: rgba(255, 255, 255, .03);
-      transition: background .5s var(--ease);
-      border-radius: 1px
-    }
-
-    .j-line.done {
-      background: var(--green)
-    }
-
-    /* CHAT */
-    .chat {
-      overflow-y: auto;
-      padding: 20px 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 0;
-      scroll-behavior: smooth;
-      -webkit-overflow-scrolling: touch
-    }
-
-    .chat::-webkit-scrollbar {
-      width: 3px
-    }
-
-    .chat::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, .05);
-      border-radius: 3px
-    }
-
-    .msg {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 4px;
-      max-width: 600px;
-      width: 100%;
-      opacity: 0;
-      transform: translateY(10px);
-      animation: msgIn .3s var(--ease) forwards
-    }
-
-    .msg.agent {
-      align-self: flex-start
-    }
-
-    .msg.user {
-      align-self: flex-end;
-      flex-direction: row-reverse
-    }
-
-    .msg-av {
-      width: 26px;
-      height: 26px;
-      border-radius: 50%;
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: .65rem;
-      margin-top: 2px
-    }
-
-    .msg.agent .msg-av {
-      background: var(--saffron-dim);
-      border: 1px solid var(--border-s)
-    }
-
-    .msg.user .msg-av {
-      background: var(--blue-dim);
-      border: 1px solid rgba(91, 141, 239, .2)
-    }
-
-    .bub {
-      padding: 12px 16px;
-      font-size: .9rem;
-      line-height: 1.65;
-      border-radius: 16px;
-      word-break: break-word
-    }
-
-    .msg.agent .bub {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-bottom-left-radius: 4px
-    }
-
-    .msg.agent .bub strong {
-      color: var(--gold-l);
-      font-weight: 600
-    }
-
-    .msg.user .bub {
-      background: linear-gradient(135deg, var(--blue), #3d6ad4);
-      color: #fff;
-      border-bottom-right-radius: 4px
-    }
-
-    @keyframes msgIn {
-      to {
-        opacity: 1;
-        transform: translateY(0)
-      }
-    }
-
-    /* TYPING */
-    .typ {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 4px;
-      align-self: flex-start;
-      opacity: 0;
-      animation: msgIn .15s var(--ease) forwards
-    }
-
-    .typ .msg-av {
-      width: 26px;
-      height: 26px;
-      border-radius: 50%;
-      background: var(--saffron-dim);
-      border: 1px solid var(--border-s);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: .65rem;
-      flex-shrink: 0
-    }
-
-    .typ-dots {
-      display: flex;
-      gap: 4px;
-      padding: 13px 16px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      border-bottom-left-radius: 4px
-    }
-
-    .typ-dot {
-      width: 5px;
-      height: 5px;
-      border-radius: 50%;
-      background: var(--text3);
-      animation: tB 1.4s ease-in-out infinite
-    }
-
-    .typ-dot:nth-child(2) {
-      animation-delay: .2s
-    }
-
-    .typ-dot:nth-child(3) {
-      animation-delay: .4s
-    }
-
-    @keyframes tB {
-
-      0%,
-      60%,
-      100% {
-        transform: translateY(0);
-        opacity: .3
-      }
-
-      30% {
-        transform: translateY(-4px);
-        opacity: 1
-      }
-    }
-
-    /* VOICE WAVE */
-    .voice-wave {
-      display: none;
-      align-items: center;
-      justify-content: center;
-      gap: 3px;
-      padding: 8px 0
-    }
-
-    .voice-wave.active {
-      display: flex
-    }
-
-    .vw-bar {
-      width: 3px;
-      background: var(--saffron);
-      border-radius: 2px;
-      animation: vwPulse 1s ease-in-out infinite
-    }
-
-    .vw-bar:nth-child(1) {
-      height: 12px;
-      animation-delay: 0s
-    }
-
-    .vw-bar:nth-child(2) {
-      height: 18px;
-      animation-delay: .15s
-    }
-
-    .vw-bar:nth-child(3) {
-      height: 24px;
-      animation-delay: .3s
-    }
-
-    .vw-bar:nth-child(4) {
-      height: 18px;
-      animation-delay: .45s
-    }
-
-    .vw-bar:nth-child(5) {
-      height: 12px;
-      animation-delay: .6s
-    }
-
-    @keyframes vwPulse {
-
-      0%,
-      100% {
-        transform: scaleY(.4);
-        opacity: .4
-      }
-
-      50% {
-        transform: scaleY(1);
-        opacity: 1
-      }
-    }
-
-    /* CARDS */
-    .rc {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 16px;
-      background: var(--surface);
-      border: 1px solid var(--border-s);
-      border-radius: var(--r);
-      margin: 6px 0;
-      cursor: pointer;
-      transition: all .25s var(--ease);
-      text-decoration: none;
-      color: inherit;
-      max-width: 600px;
-      opacity: 0;
-      transform: translateY(10px);
-      animation: msgIn .3s var(--ease) forwards
-    }
-
-    .rc:hover,
-    .rc:focus {
-      background: var(--card-h);
-      border-color: var(--saffron);
-      transform: translateY(-2px);
-      box-shadow: 0 4px 20px rgba(255, 153, 51, .06);
-      outline: none
-    }
-
-    .rc-ico {
-      width: 40px;
-      height: 40px;
-      border-radius: 10px;
-      background: var(--saffron-dim);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.1rem;
-      flex-shrink: 0
-    }
-
-    .rc-body {
-      flex: 1;
-      min-width: 0
-    }
-
-    .rc-body h4 {
-      font-family: var(--fd);
-      font-size: .85rem;
-      font-weight: 600;
-      margin-bottom: 1px
-    }
-
-    .rc-body p {
-      font-size: .72rem;
-      color: var(--text3);
-      line-height: 1.3
-    }
-
-    .rc-tag {
-      display: block;
-      font-family: var(--fm);
-      font-size: .5rem;
-      letter-spacing: .07em;
-      text-transform: uppercase;
-      color: var(--saffron);
-      margin-top: 5px;
-      opacity: .6
-    }
-
-    .rc-arr {
-      color: var(--saffron);
-      font-size: .7rem;
-      opacity: 0;
-      transition: all .25s var(--ease);
-      flex-shrink: 0
-    }
-
-    .rc:hover .rc-arr {
-      opacity: 1;
-      transform: translateX(3px)
-    }
-
-    .rc-links {
-      padding: 12px 16px;
-      background: var(--surface);
-      border: 1px solid var(--border-s);
-      border-radius: var(--r);
-      margin: 6px 0;
-      max-width: 600px;
-      width: 100%;
-      opacity: 0;
-      transform: translateY(10px);
-      animation: msgIn .3s var(--ease) forwards;
-      display: flex;
-      flex-direction: column;
-      gap: 6px
-    }
-
-    .rc-links-head {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 4px
-    }
-
-    .rc-links-head h4 {
-      font-family: var(--fd);
-      font-size: .85rem;
-      font-weight: 600
-    }
-
-    .rc-link {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 12px;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      color: var(--saffron);
-      font-size: .82rem;
-      text-decoration: none;
-      transition: all .25s var(--ease)
-    }
-
-    .rc-link:hover,
-    .rc-link:focus {
-      border-color: var(--border-s);
-      background: var(--card-h);
-      outline: none
-    }
-
-    .rc-link span {
-      margin-left: auto;
-      opacity: .35;
-      font-size: .6rem
-    }
-
-    /* YouTube Embed */
-    .yt-embed {
-      position: relative;
-      width: 100%;
-      max-width: 600px;
-      padding-bottom: 56.25%;
-      height: 0;
-      overflow: hidden;
-      border-radius: var(--r);
-      margin: 8px 0;
-      border: 1px solid var(--border-s);
-      opacity: 0;
-      transform: translateY(10px);
-      animation: msgIn .3s var(--ease) forwards
-    }
-
-    .yt-embed iframe {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      border: 0
-    }
-
-    /* Google Maps Embed */
-    .maps-embed {
-      position: relative;
-      width: 100%;
-      max-width: 600px;
-      height: 250px;
-      border-radius: var(--r);
-      margin: 8px 0;
-      border: 1px solid var(--border-s);
-      overflow: hidden;
-      opacity: 0;
-      transform: translateY(10px);
-      animation: msgIn .3s var(--ease) forwards
-    }
-
-    .maps-embed iframe {
-      width: 100%;
-      height: 100%;
-      border: 0
-    }
-
-    /* CHOICES */
-    .choices {
-      padding: 10px 16px 8px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      max-width: 640px;
-      margin: 0 auto;
-      width: 100%
-    }
-
-    .ch {
-      width: 100%;
-      padding: 12px 16px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      color: var(--text);
-      font-family: var(--fb);
-      font-size: .9rem;
-      cursor: pointer;
-      text-align: left;
-      transition: all .25s var(--ease);
-      opacity: 0;
-      transform: translateY(8px);
-      animation: cIn .3s var(--ease) forwards;
-      position: relative;
-      overflow: hidden
-    }
-
-    .ch::before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 0;
-      bottom: 0;
-      width: 3px;
-      background: var(--saffron);
-      transform: scaleY(0);
-      transition: transform .25s var(--ease);
-      border-radius: 0 2px 2px 0
-    }
-
-    .ch:hover,
-    .ch:focus {
-      background: var(--card-h);
-      border-color: var(--border-s);
-      transform: translateX(3px);
-      outline: none
-    }
-
-    .ch:hover::before,
-    .ch:focus::before {
-      transform: scaleY(1)
-    }
-
-    .ch.sel {
-      background: var(--saffron-dim);
-      border-color: var(--saffron);
-      color: var(--saffron-l)
-    }
-
-    .ch.sel::before {
-      transform: scaleY(1)
-    }
-
-    .ch:disabled {
-      opacity: .35;
-      cursor: not-allowed;
-      transform: none !important
-    }
-
-    @keyframes cIn {
-      to {
-        opacity: 1;
-        transform: translateY(0)
-      }
-    }
-
-    /* INPUT */
-    .input-area {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 12px 16px;
-      background: rgba(5, 8, 16, .9);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-top: 1px solid var(--border)
-    }
-
-    .inp {
-      flex: 1;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 12px 16px;
-      color: var(--text);
-      font-family: var(--fb);
-      font-size: .9rem;
-      outline: none;
-      transition: border-color .25s var(--ease)
-    }
-
-    .inp:focus {
-      border-color: var(--border-s)
-    }
-
-    .inp::placeholder {
-      color: var(--text3)
-    }
-
-    .send-btn,
-    .voice-btn {
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      border: none;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: all .25s var(--ease);
-      flex-shrink: 0;
-      font-size: .9rem
-    }
-
-    .send-btn {
-      background: var(--saffron);
-      color: var(--bg)
-    }
-
-    .send-btn:hover,
-    .send-btn:focus {
-      background: var(--saffron-l);
-      transform: scale(1.05);
-      outline: none
-    }
-
-    .voice-btn {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      color: var(--text3)
-    }
-
-    .voice-btn:hover,
-    .voice-btn:focus {
-      border-color: var(--border-s);
-      color: var(--saffron);
-      outline: none
-    }
-
-    .voice-btn.recording {
-      background: rgba(255, 50, 50, .15);
-      border-color: rgba(255, 50, 50, .4);
-      color: #ff5050;
-      animation: recPulse 1.5s ease-in-out infinite
-    }
-
-    @keyframes recPulse {
-
-      0%,
-      100% {
-        box-shadow: 0 0 0 0 rgba(255, 50, 50, .2)
-      }
-
-      50% {
-        box-shadow: 0 0 0 8px rgba(255, 50, 50, 0)
-      }
-    }
-
-    /* QUICK ACTIONS */
-    .qa {
-      display: flex;
-      gap: 6px;
-      padding: 6px 16px 10px;
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch
-    }
-
-    .qa::-webkit-scrollbar {
-      display: none
-    }
-
-    .qa-btn {
-      flex-shrink: 0;
-      padding: 6px 14px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 100px;
-      color: var(--text2);
-      font-family: var(--fm);
-      font-size: .7rem;
-      cursor: pointer;
-      transition: all .25s var(--ease);
-      white-space: nowrap
-    }
-
-    .qa-btn:hover,
-    .qa-btn:focus {
-      border-color: var(--border-s);
-      color: var(--saffron);
-      background: var(--saffron-dim);
-      outline: none
-    }
-
-    /* CELEBRATION */
-    #cele {
-      position: fixed;
-      inset: 0;
-      z-index: 200;
-      pointer-events: none;
-      display: none
-    }
-
-    #cele.on {
-      display: block
-    }
-
-    .conf {
-      position: absolute;
-      top: -10px;
-      animation: cFall linear forwards
-    }
-
-    @keyframes cFall {
-      to {
-        transform: translateY(110vh) rotate(720deg);
-        opacity: 0
-      }
-    }
-
-    .cele-m {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) scale(0);
-      background: var(--card);
-      border: 2px solid var(--saffron);
-      border-radius: 20px;
-      padding: 40px;
-      text-align: center;
-      z-index: 201;
-      max-width: 380px;
-      width: 90%;
-      animation: celeP .5s .4s cubic-bezier(.17, .67, .35, 1.2) forwards
-    }
-
-    @keyframes celeP {
-      to {
-        transform: translate(-50%, -50%) scale(1)
-      }
-    }
-
-    .cele-m h2 {
-      font-family: var(--fd);
-      font-size: 1.5rem;
-      font-weight: 800;
-      margin-bottom: 6px
-    }
-
-    .cele-m p {
-      color: var(--text2);
-      font-size: .88rem;
-      margin-bottom: 20px;
-      line-height: 1.6
-    }
-
-    .cele-m button {
-      font-family: var(--fm);
-      font-size: .72rem;
-      letter-spacing: .1em;
-      text-transform: uppercase;
-      background: var(--saffron);
-      color: var(--bg);
-      border: none;
-      padding: 11px 24px;
-      border-radius: 100px;
-      cursor: pointer;
-      transition: all .25s var(--ease)
-    }
-
-    .cele-m button:hover,
-    .cele-m button:focus {
-      background: var(--saffron-l);
-      transform: translateY(-1px);
-      outline: none
-    }
-
-    /* RESPONSIVE */
-    @media(max-width:600px) {
-      .hdr {
-        padding: 10px 14px;
-        gap: 10px
-      }
-
-      .chat {
-        padding: 14px 12px
-      }
-
-      .choices {
-        padding: 8px 12px 12px
-      }
-
-      .ch {
-        padding: 10px 14px;
-        font-size: .86rem
-      }
-
-      .bub {
-        padding: 10px 14px;
-        font-size: .86rem
-      }
-
-      .j-dot::after {
-        display: none
-      }
-
-      .j-line {
-        width: 10px
-      }
-
-      .ls-grid {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 8px
-      }
-
-      .ls-card {
-        padding: 10px 6px
-      }
-
-      .ls-card .native {
-        font-size: .9rem
-      }
-
-      .ls-orb {
-        width: 90px;
-        height: 90px
-      }
-
-      .ls-orb-c {
-        inset: 18px
-      }
-
-      .ls-orb-r1 {
-        inset: 3px
-      }
-
-      .ls-orb-r2 {
-        inset: 10px
-      }
-
-      .input-area {
-        padding: 10px 12px
-      }
-
-      .inp {
-        padding: 10px 14px;
-        font-size: .86rem
-      }
-
-      .send-btn,
-      .voice-btn {
-        width: 38px;
-        height: 38px;
-        font-size: .8rem
-      }
-
-      .yt-embed,
-      .maps-embed {
-        max-width: 100%
-      }
-    }
-
-    /* HIGH CONTRAST / REDUCED MOTION */
-    @media(prefers-reduced-motion:reduce) {
-      * {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important
-      }
-    }
-
-    @media(prefers-contrast:high) {
-      :root {
-        --border: rgba(255, 255, 255, .2);
-        --text2: #b0b8c8;
-        --text3: #6a7080
-      }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<meta name="description" content="Navi — Interactive Indian Election Guide Agent. Nonpartisan, multilingual, voice-enabled assistant for Indian voters. Built with Google Services integration.">
+<meta name="theme-color" content="#050810">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https:; connect-src https:; img-src https: data:; media-src https:; frame-src https:;">
+<meta name="robots" content="index, follow">
+<meta name="author" content="Navi Team">
+<title>Navi — Indian Election Guide Agent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400&family=Source+Serif+4:opsz,wght@8..60,300;8..60,400&family=Noto+Sans+Devanagari:wght@400;600;700&family=Noto+Sans+Tamil:wght@400;600&family=Noto+Sans+Kannada:wght@400;600&family=Noto+Sans+Telugu:wght@400;600&family=Noto+Sans+Bengali:wght@400;600&family=Noto+Sans+Gujarati:wght@400;600&family=Noto+Sans+Malayalam:wght@400;600&family=Noto+Sans+Gurmukhi:wght@400;600&family=Noto+Sans+Oriya:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* ================================================================
+   NAVI — Indian Election Guide Agent v3.0
+   Aesthetic: Dark cinematic, saffron-gold accents
+   Architecture: Single-file, zero dependencies, production-grade
+   ================================================================ */
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#050810;--bg2:#0a0e1a;--surface:#111827;--card:#161d2e;--card-h:#1e2740;
+  --saffron:#ff9933;--saffron-l:#ffb366;--saffron-dim:rgba(255,153,51,.1);
+  --gold:#d4a84b;--gold-l:#f0d878;--gold-dim:rgba(212,168,75,.08);
+  --green:#138808;--green-l:#25c41b;--green-dim:rgba(19,136,8,.1);
+  --blue:#5b8def;--blue-dim:rgba(91,141,239,.1);
+  --text:#eef0f5;--text2:#8891a5;--text3:#3e4558;
+  --border:rgba(255,255,255,.05);--border-s:rgba(255,153,51,.15);
+  --fd:'Syne',sans-serif;--fb:'Source Serif 4',serif;--fm:'DM Mono',monospace;
+  --ease:cubic-bezier(.4,0,.2,1);--r:14px;--r-sm:10px;
+  --chat-max:620px;--card-max:620px
+}
+html{scroll-behavior:smooth;scrollbar-width:thin;scrollbar-color:var(--saffron-dim) var(--bg)}
+html,body{height:100%;overflow:hidden}
+body{font-family:var(--fb);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 0%,rgba(40,20,5,.3) 0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(10,30,15,.2) 0%,transparent 50%),radial-gradient(ellipse at 50% 50%,rgba(10,15,30,.15) 0%,transparent 60%);pointer-events:none;z-index:0}
+.skip-link{position:absolute;top:-100px;left:16px;z-index:9999;padding:12px 20px;background:var(--saffron);color:var(--bg);font-family:var(--fm);font-size:.8rem;border-radius:var(--r-sm);text-decoration:none;transition:top .3s;focus:top:16px}
+.skip-link:focus{top:16px}
+#particles{position:fixed;inset:0;z-index:0;pointer-events:none}
+
+/* ===== LANGUAGE SELECTOR ===== */
+#langSel{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;transition:all .9s var(--ease);overflow-y:auto;-webkit-overflow-scrolling:touch}
+#langSel.exit{opacity:0;transform:scale(1.1);pointer-events:none}
+.ls-orb{position:relative;width:120px;height:120px;margin-bottom:28px;opacity:0;animation:fadeUp .7s .2s var(--ease) forwards}
+.ls-orb-c{position:absolute;inset:24px;border-radius:50%;background:radial-gradient(circle at 35% 35%,var(--saffron-l),var(--saffron) 50%,#b35900);box-shadow:0 0 40px rgba(255,153,51,.35),0 0 80px rgba(255,153,51,.1);animation:breathe 4s ease-in-out infinite}
+.ls-orb-r{position:absolute;border-radius:50%;border:1.5px solid transparent}
+.ls-orb-r1{inset:4px;border-top-color:rgba(255,153,51,.35);animation:spin 10s linear infinite}
+.ls-orb-r2{inset:14px;border-bottom-color:rgba(212,168,75,.25);animation:spin 14s linear infinite reverse}
+@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ls-title{font-family:var(--fd);font-size:clamp(2rem,5vw,3rem);font-weight:800;margin-bottom:6px;opacity:0;animation:fadeUp .7s .35s var(--ease) forwards}
+.ls-sub{color:var(--text2);font-size:.95rem;margin-bottom:32px;font-weight:300;opacity:0;animation:fadeUp .7s .5s var(--ease) forwards;text-align:center;max-width:400px}
+.ls-label{font-family:var(--fm);font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;color:var(--saffron);margin-bottom:16px;opacity:0;animation:fadeUp .7s .6s var(--ease) forwards}
+.ls-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;max-width:740px;width:100%;opacity:0;animation:fadeUp .7s .7s var(--ease) forwards}
+.ls-card{padding:14px 10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);cursor:pointer;text-align:center;transition:all .3s var(--ease);position:relative;overflow:hidden}
+.ls-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,153,51,.05),transparent);opacity:0;transition:opacity .3s}
+.ls-card:hover,.ls-card:focus-visible{border-color:var(--border-s);transform:translateY(-3px);box-shadow:0 6px 24px rgba(255,153,51,.08);outline:2px solid var(--saffron);outline-offset:2px}
+.ls-card:hover::before,.ls-card:focus-visible::before{opacity:1}
+.ls-card .native{font-size:1.05rem;font-weight:600;line-height:1.4;display:block;margin-bottom:2px}
+.ls-card .latin{font-family:var(--fm);font-size:.6rem;color:var(--text3);letter-spacing:.05em;text-transform:uppercase}
+.ls-disclaimer{position:fixed;bottom:20px;font-family:var(--fm);font-size:.55rem;color:var(--text3);letter-spacing:.06em;text-align:center;padding:0 16px;opacity:0;animation:fadeUp .7s 1s var(--ease) forwards}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+/* ===== CHAT SCREEN ===== */
+#chatScreen{position:fixed;inset:0;z-index:50;display:grid;grid-template-rows:auto auto 1fr auto auto;opacity:0;transform:scale(.95);pointer-events:none;transition:all .8s var(--ease)}
+#chatScreen.active{opacity:1;transform:scale(1);pointer-events:all}
+
+/* HEADER */
+.hdr{display:flex;align-items:center;gap:12px;padding:12px 20px;background:rgba(5,8,16,.92);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid var(--border);z-index:10}
+.h-orb{position:relative;width:38px;height:38px;flex-shrink:0}
+.h-orb-c{position:absolute;inset:5px;border-radius:50%;background:radial-gradient(circle at 35% 35%,var(--saffron-l),var(--saffron) 55%,#b35900);box-shadow:0 0 14px rgba(255,153,51,.35);animation:breathe 3.5s ease-in-out infinite}
+.h-orb-r1{position:absolute;inset:0;border-radius:50%;border-top:1.5px solid rgba(255,153,51,.3);border-right:1.5px solid rgba(255,153,51,.05);animation:spin 8s linear infinite}
+.h-orb-r2{position:absolute;inset:3px;border-radius:50%;border-bottom:1.5px solid rgba(212,168,75,.2);border-left:1.5px solid rgba(212,168,75,.03);animation:spin 12s linear infinite reverse}
+.h-orb.thinking .h-orb-c{animation-duration:1s;box-shadow:0 0 22px rgba(255,153,51,.6)}
+.h-info{flex:1;min-width:0}
+.h-name{font-family:var(--fd);font-size:.95rem;font-weight:700}
+.h-status{font-family:var(--fm);font-size:.6rem;color:var(--text3);letter-spacing:.04em;transition:color .3s}
+.h-status.on{color:var(--saffron)}
+.h-ctrls{display:flex;align-items:center;gap:6px}
+.h-btn{width:34px;height:34px;border-radius:50%;border:1px solid var(--border);background:transparent;color:var(--text3);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .25s var(--ease);font-size:.8rem;position:relative}
+.h-btn:hover,.h-btn:focus-visible{border-color:var(--border-s);color:var(--saffron);background:var(--saffron-dim);outline:none}
+.h-btn:focus-visible{outline:2px solid var(--saffron);outline-offset:2px}
+.h-btn.active{border-color:var(--saffron);color:var(--saffron);background:var(--saffron-dim)}
+.h-btn.lang-btn{font-size:.65rem;font-family:var(--fm);font-weight:600;width:auto;padding:0 10px;border-radius:16px;letter-spacing:.03em}
+.h-ring{position:relative;width:36px;height:36px;flex-shrink:0}
+.h-ring svg{width:100%;height:100%}
+.h-ring-bg{fill:none;stroke:rgba(255,255,255,.04);stroke-width:3}
+.h-ring-f{fill:none;stroke:var(--saffron);stroke-width:3;stroke-linecap:round;stroke-dasharray:94;stroke-dashoffset:94;transition:stroke-dashoffset .8s var(--ease)}
+.h-ring-t{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--fm);font-size:.5rem;font-weight:700;color:var(--saffron)}
+
+/* JOURNEY BAR */
+.j-bar{display:flex;align-items:center;justify-content:center;gap:3px;padding:10px 16px;background:var(--bg2);border-bottom:1px solid var(--border)}
+.j-dot{width:7px;height:7px;border-radius:50%;background:var(--card);border:1.5px solid rgba(255,255,255,.06);transition:all .5s var(--ease);position:relative}
+.j-dot.active{background:var(--saffron);border-color:var(--saffron);box-shadow:0 0 8px rgba(255,153,51,.3)}
+.j-dot.done{background:var(--green-l);border-color:var(--green)}
+.j-dot::after{content:attr(data-l);position:absolute;top:12px;left:50%;transform:translateX(-50%);font-family:var(--fm);font-size:.45rem;color:var(--text3);white-space:nowrap;opacity:0;transition:opacity .3s;pointer-events:none}
+.j-dot.active::after,.j-dot:hover::after{opacity:1}
+.j-line{width:16px;height:2px;background:rgba(255,255,255,.03);transition:background .5s var(--ease);border-radius:1px}
+.j-line.done{background:var(--green)}
+
+/* CHAT */
+.chat{overflow-y:auto;padding:20px 16px;display:flex;flex-direction:column;gap:0;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.chat::-webkit-scrollbar{width:3px}.chat::-webkit-scrollbar-track{background:transparent}.chat::-webkit-scrollbar-thumb{background:rgba(255,255,255,.05);border-radius:3px}
+.msg{display:flex;gap:10px;margin-bottom:4px;max-width:var(--chat-max);width:100%;opacity:0;transform:translateY(10px);animation:msgIn .3s var(--ease) forwards;will-change:transform,opacity}
+.msg.agent{align-self:flex-start}.msg.user{align-self:flex-end;flex-direction:row-reverse}
+.msg-av{width:26px;height:26px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.65rem;margin-top:2px}
+.msg.agent .msg-av{background:var(--saffron-dim);border:1px solid var(--border-s)}
+.msg.user .msg-av{background:var(--blue-dim);border:1px solid rgba(91,141,239,.2)}
+.bub{padding:12px 16px;font-size:.9rem;line-height:1.65;border-radius:16px;word-break:break-word}
+.msg.agent .bub{background:var(--surface);border:1px solid var(--border);border-bottom-left-radius:4px}
+.msg.agent .bub strong{color:var(--gold-l);font-weight:600}
+.msg.agent .bub em{color:var(--text2);font-style:italic;font-size:.82rem}
+.msg.user .bub{background:linear-gradient(135deg,var(--blue),#3d6ad4);color:#fff;border-bottom-right-radius:4px}
+@keyframes msgIn{to{opacity:1;transform:translateY(0)}}
+.typ{display:flex;gap:10px;margin-bottom:4px;align-self:flex-start;opacity:0;animation:msgIn .15s var(--ease) forwards}
+.typ .msg-av{width:26px;height:26px;border-radius:50%;background:var(--saffron-dim);border:1px solid var(--border-s);display:flex;align-items:center;justify-content:center;font-size:.65rem;flex-shrink:0}
+.typ-dots{display:flex;gap:4px;padding:13px 16px;background:var(--surface);border:1px solid var(--border);border-radius:16px;border-bottom-left-radius:4px}
+.typ-dot{width:5px;height:5px;border-radius:50%;background:var(--text3);animation:tB 1.4s ease-in-out infinite}
+.typ-dot:nth-child(2){animation-delay:.2s}.typ-dot:nth-child(3){animation-delay:.4s}
+@keyframes tB{0%,60%,100%{transform:translateY(0);opacity:.3}30%{transform:translateY(-4px);opacity:1}}
+
+/* VOICE WAVE */
+.voice-wave{display:none;align-items:center;justify-content:center;gap:3px;padding:8px 0}
+.voice-wave.active{display:flex}
+.vw-bar{width:3px;background:var(--saffron);border-radius:2px;animation:vwPulse 1s ease-in-out infinite}
+.vw-bar:nth-child(1){height:12px;animation-delay:0s}
+.vw-bar:nth-child(2){height:18px;animation-delay:.15s}
+.vw-bar:nth-child(3){height:24px;animation-delay:.3s}
+.vw-bar:nth-child(4){height:18px;animation-delay:.45s}
+.vw-bar:nth-child(5){height:12px;animation-delay:.6s}
+@keyframes vwPulse{0%,100%{transform:scaleY(.4);opacity:.4}50%{transform:scaleY(1);opacity:1}}
+
+/* CARDS */
+.rc{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--surface);border:1px solid var(--border-s);border-radius:var(--r);margin:6px 0;cursor:pointer;transition:all .25s var(--ease);text-decoration:none;color:inherit;max-width:var(--card-max);width:100%;opacity:0;transform:translateY(10px);animation:msgIn .3s var(--ease) forwards}
+.rc:hover,.rc:focus-visible{background:var(--card-h);border-color:var(--saffron);transform:translateY(-2px);box-shadow:0 4px 20px rgba(255,153,51,.06);outline:none}
+.rc:focus-visible{outline:2px solid var(--saffron);outline-offset:2px}
+.rc-ico{width:40px;height:40px;border-radius:10px;background:var(--saffron-dim);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
+.rc-body{flex:1;min-width:0}
+.rc-body h4{font-family:var(--fd);font-size:.85rem;font-weight:600;margin-bottom:1px}
+.rc-body p{font-size:.72rem;color:var(--text3);line-height:1.3}
+.rc-tag{display:block;font-family:var(--fm);font-size:.5rem;letter-spacing:.07em;text-transform:uppercase;color:var(--saffron);margin-top:5px;opacity:.6}
+.rc-arr{color:var(--saffron);font-size:.7rem;opacity:0;transition:all .25s var(--ease);flex-shrink:0}
+.rc:hover .rc-arr{opacity:1;transform:translateX(3px)}
+.rc-links{padding:12px 16px;background:var(--surface);border:1px solid var(--border-s);border-radius:var(--r);margin:6px 0;max-width:var(--card-max);width:100%;opacity:0;transform:translateY(10px);animation:msgIn .3s var(--ease) forwards;display:flex;flex-direction:column;gap:6px}
+.rc-links-head{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.rc-links-head h4{font-family:var(--fd);font-size:.85rem;font-weight:600}
+.rc-link{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--saffron);font-size:.82rem;text-decoration:none;transition:all .25s var(--ease)}
+.rc-link:hover,.rc-link:focus-visible{border-color:var(--border-s);background:var(--card-h);outline:none}
+.rc-link:focus-visible{outline:2px solid var(--saffron);outline-offset:2px}
+.rc-link span{margin-left:auto;opacity:.35;font-size:.6rem}
+
+/* EMBEDS */
+.yt-embed{position:relative;width:100%;max-width:var(--card-max);padding-bottom:56.25%;height:0;overflow:hidden;border-radius:var(--r);margin:8px 0;border:1px solid var(--border-s);opacity:0;transform:translateY(10px);animation:msgIn .3s var(--ease) forwards}
+.yt-embed iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0}
+.maps-embed{position:relative;width:100%;max-width:var(--card-max);height:250px;border-radius:var(--r);margin:8px 0;border:1px solid var(--border-s);overflow:hidden;opacity:0;transform:translateY(10px);animation:msgIn .3s var(--ease) forwards}
+.maps-embed iframe{width:100%;height:100%;border:0}
+
+/* CHOICES */
+.choices{padding:10px 16px 8px;display:flex;flex-direction:column;gap:6px;max-width:640px;margin:0 auto;width:100%}
+.ch{width:100%;padding:12px 16px;background:var(--surface);border:1px solid var(--border);border-radius:12px;color:var(--text);font-family:var(--fb);font-size:.9rem;cursor:pointer;text-align:left;transition:all .25s var(--ease);opacity:0;transform:translateY(8px);animation:cIn .3s var(--ease) forwards;position:relative;overflow:hidden}
+.ch::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--saffron);transform:scaleY(0);transition:transform .25s var(--ease);border-radius:0 2px 2px 0}
+.ch:hover,.ch:focus-visible{background:var(--card-h);border-color:var(--border-s);transform:translateX(3px);outline:none}
+.ch:focus-visible{outline:2px solid var(--saffron);outline-offset:2px}
+.ch:hover::before,.ch:focus-visible::before{transform:scaleY(1)}
+.ch.sel{background:var(--saffron-dim);border-color:var(--saffron);color:var(--saffron-l)}
+.ch.sel::before{transform:scaleY(1)}
+.ch:disabled{opacity:.35;cursor:not-allowed;transform:none!important}
+@keyframes cIn{to{opacity:1;transform:translateY(0)}}
+
+/* INPUT */
+.input-area{display:flex;align-items:center;gap:8px;padding:12px 16px;background:rgba(5,8,16,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--border)}
+.inp{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 16px;color:var(--text);font-family:var(--fb);font-size:.9rem;outline:none;transition:border-color .25s var(--ease)}
+.inp:focus{border-color:var(--border-s);box-shadow:0 0 0 2px rgba(255,153,51,.1)}
+.inp::placeholder{color:var(--text3)}
+.send-btn,.voice-btn{width:42px;height:42px;border-radius:50%;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .25s var(--ease);flex-shrink:0;font-size:.9rem}
+.send-btn{background:var(--saffron);color:var(--bg)}
+.send-btn:hover,.send-btn:focus-visible{background:var(--saffron-l);transform:scale(1.05)}
+.voice-btn{background:var(--surface);border:1px solid var(--border);color:var(--text3)}
+.voice-btn:hover,.voice-btn:focus-visible{border-color:var(--border-s);color:var(--saffron)}
+.voice-btn.recording{background:rgba(255,50,50,.15);border-color:rgba(255,50,50,.4);color:#ff5050;animation:recPulse 1.5s ease-in-out infinite}
+@keyframes recPulse{0%,100%{box-shadow:0 0 0 0 rgba(255,50,50,.2)}50%{box-shadow:0 0 0 8px rgba(255,50,50,0)}}
+.qa{display:flex;gap:6px;padding:6px 16px 10px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.qa::-webkit-scrollbar{display:none}
+.qa-btn{flex-shrink:0;padding:6px 14px;background:var(--surface);border:1px solid var(--border);border-radius:100px;color:var(--text2);font-family:var(--fm);font-size:.7rem;cursor:pointer;transition:all .25s var(--ease);white-space:nowrap}
+.qa-btn:hover,.qa-btn:focus-visible{border-color:var(--border-s);color:var(--saffron);background:var(--saffron-dim)}
+
+/* CELEBRATION */
+#cele{position:fixed;inset:0;z-index:200;pointer-events:none;display:none}
+#cele.on{display:block}
+.conf{position:absolute;top:-10px;animation:cFall linear forwards;will-change:transform}
+@keyframes cFall{to{transform:translateY(110vh) rotate(720deg);opacity:0}}
+.cele-m{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);background:var(--card);border:2px solid var(--saffron);border-radius:20px;padding:40px;text-align:center;z-index:201;max-width:380px;width:90%;animation:celeP .5s .4s cubic-bezier(.17,.67,.35,1.2) forwards}
+@keyframes celeP{to{transform:translate(-50%,-50%) scale(1)}}
+.cele-m h2{font-family:var(--fd);font-size:1.5rem;font-weight:800;margin-bottom:6px}
+.cele-m p{color:var(--text2);font-size:.88rem;margin-bottom:20px;line-height:1.6}
+.cele-m button{font-family:var(--fm);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;background:var(--saffron);color:var(--bg);border:none;padding:11px 24px;border-radius:100px;cursor:pointer;transition:all .25s var(--ease)}
+.cele-m button:hover,.cele-m button:focus-visible{background:var(--saffron-l);transform:translateY(-1px)}
+
+/* API MODAL */
+.api-modal{position:fixed;inset:0;z-index:300;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);backdrop-filter:blur(8px)}
+.api-modal-inner{background:var(--card);border:1px solid var(--border-s);border-radius:20px;padding:36px;max-width:420px;width:90%}
+.api-modal-inner h3{font-family:var(--fd);font-size:1.2rem;margin-bottom:8px}
+.api-modal-inner p{color:var(--text2);font-size:.85rem;line-height:1.6;margin-bottom:16px}
+.api-modal-inner input{width:100%;padding:12px 16px;background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:var(--fm);font-size:.8rem;margin-bottom:16px;outline:none}
+.api-modal-inner input:focus{border-color:var(--border-s);box-shadow:0 0 0 2px rgba(255,153,51,.1)}
+.api-modal-btns{display:flex;gap:10px;justify-content:flex-end}
+.api-modal-btns button{font-family:var(--fm);font-size:.72rem;padding:10px 20px;border-radius:100px;border:none;cursor:pointer;transition:all .25s var(--ease);letter-spacing:.05em;text-transform:uppercase}
+.api-modal-btns .skip{background:var(--surface);border:1px solid var(--border);color:var(--text2)}
+.api-modal-btns .skip:hover{border-color:var(--border-s);color:var(--text)}
+.api-modal-btns .save{background:var(--saffron);color:var(--bg)}
+.api-modal-btns .save:hover{background:var(--saffron-l)}
+.api-modal a{color:var(--saffron);font-size:.78rem;display:inline-block;margin-bottom:12px}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:600px){
+  .hdr{padding:10px 14px;gap:10px}
+  .chat{padding:14px 12px}
+  .choices{padding:8px 12px 12px}
+  .ch{padding:10px 14px;font-size:.86rem}
+  .bub{padding:10px 14px;font-size:.86rem}
+  .j-dot::after{display:none}
+  .j-line{width:10px}
+  .ls-grid{grid-template-columns:repeat(3,1fr);gap:8px}
+  .ls-card{padding:10px 6px}
+  .ls-card .native{font-size:.9rem}
+  .ls-orb{width:90px;height:90px}
+  .ls-orb-c{inset:18px}
+  .ls-orb-r1{inset:3px}
+  .ls-orb-r2{inset:10px}
+  .input-area{padding:10px 12px}
+  .inp{padding:10px 14px;font-size:.86rem}
+  .send-btn,.voice-btn{width:38px;height:38px;font-size:.8rem}
+  .h-btn{width:30px;height:30px;font-size:.7rem}
+  .h-btn.lang-btn{padding:0 8px;font-size:.6rem}
+}
+
+/* ===== ACCESSIBILITY ===== */
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+  .ls-orb-c,.h-orb-c{animation:none!important}
+}
+@media(prefers-contrast:high){
+  :root{--border:rgba(255,255,255,.2);--border-s:rgba(255,153,51,.4);--text2:#b0b8c8;--text3:#6a7080}
+  .ch,.rc,.qa-btn{border-width:2px}
+}
+@media(prefers-color-scheme:light){
+  /* Dark theme enforced — election agent aesthetic */
+}
+:focus-visible{outline:2px solid var(--saffron);outline-offset:2px}
+</style>
 </head>
-
 <body>
 
-  <!-- Accessibility: Skip Navigation -->
-  <a href="#chat" class="skip-link" id="skipLink">Skip to main content</a>
+<!-- Accessibility: Skip Navigation -->
+<a href="#chat" class="skip-link" id="skipLink">Skip to main content</a>
 
-  <!-- Background Particles -->
-  <canvas id="particles" aria-hidden="true"></canvas>
+<!-- Background Particles (decorative, hidden from assistive tech) -->
+<canvas id="particles" aria-hidden="true"></canvas>
 
-  <!-- ===== LANGUAGE SELECTOR ===== -->
-  <div id="langSel" role="dialog" aria-label="Language Selection" aria-modal="true">
-    <div class="gtranslate-bar" id="gtranslateBar">
-      <div id="google_translate_element"></div>
+<!-- ===== LANGUAGE SELECTOR ===== -->
+<div id="langSel" role="dialog" aria-label="Language Selection" aria-modal="true">
+  <div class="ls-orb" aria-hidden="true"><div class="ls-orb-r ls-orb-r1"></div><div class="ls-orb-r ls-orb-r2"></div><div class="ls-orb-c"></div></div>
+  <h1 class="ls-title">Navi</h1>
+  <p class="ls-sub" id="lsSub">Your Indian Election Guide Agent</p>
+  <div class="ls-label" id="lsLabel">Choose Your Language</div>
+  <div class="ls-grid" id="lsGrid" role="listbox" aria-label="Select your preferred language"></div>
+  <div class="ls-disclaimer">Nonpartisan · Educational · No data collected · Verify with ECI at eci.gov.in</div>
+</div>
+
+<!-- ===== CHAT SCREEN ===== -->
+<div id="chatScreen" role="main" aria-label="Election Guide Chat">
+  <header class="hdr" role="banner">
+    <div class="h-orb" id="hOrb" aria-hidden="true"><div class="h-orb-r1"></div><div class="h-orb-r2"></div><div class="h-orb-c"></div></div>
+    <div class="h-info">
+      <div class="h-name">Navi</div>
+      <div class="h-status" id="hSt" aria-live="polite" aria-atomic="true">Election Guide</div>
     </div>
-    <div class="ls-orb" aria-hidden="true">
-      <div class="ls-orb-r ls-orb-r1"></div>
-      <div class="ls-orb-r ls-orb-r2"></div>
-      <div class="ls-orb-c"></div>
-    </div>
-    <h1 class="ls-title">Navi</h1>
-    <p class="ls-sub" id="lsSub">Your Indian Election Guide Agent</p>
-    <div class="ls-label" id="lsLabel">Choose Your Language</div>
-    <div class="ls-grid" id="lsGrid" role="listbox" aria-label="Select language"></div>
-    <div class="ls-disclaimer">Nonpartisan · Educational · No data collected · Verify with ECI at eci.gov.in</div>
-  </div>
+    <nav class="h-ctrls" id="hCtrls" aria-label="Agent controls">
+      <button class="h-btn" id="aiTog" title="Enable AI mode (Gemini)" aria-label="Toggle AI mode" aria-pressed="false">✦</button>
+      <button class="h-btn lang-btn" id="langBtn" title="Change language" aria-label="Change language">EN</button>
+      <button class="h-btn" id="voiceTog" title="Toggle voice output" aria-label="Toggle voice output" aria-pressed="false">🔇</button>
+      <div class="h-ring" role="img" aria-label="Journey progress percentage">
+        <svg viewBox="0 0 38 38" aria-hidden="true"><circle class="h-ring-bg" cx="19" cy="19" r="15"/><circle class="h-ring-f" id="hRF" cx="19" cy="19" r="15"/></svg>
+        <span class="h-ring-t" id="hRT" aria-hidden="true">0%</span>
+      </div>
+    </nav>
+  </header>
+  <div class="j-bar" id="jBar" role="progressbar" aria-label="Journey progress" aria-valuemin="0" aria-valuemax="7" aria-valuenow="0"></div>
+  <main class="chat" id="chat" aria-live="polite" aria-relevant="additions" aria-label="Conversation with Navi"></main>
+  <div class="voice-wave" id="vWave" aria-hidden="true"><div class="vw-bar"></div><div class="vw-bar"></div><div class="vw-bar"></div><div class="vw-bar"></div><div class="vw-bar"></div></div>
+  <div class="choices" id="choices" role="group" aria-label="Response options"></div>
+  <form class="input-area" id="inputForm" role="search" aria-label="Ask a question" onsubmit="return false">
+    <label for="userInp" class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0">Ask your election question</label>
+    <input type="text" class="inp" id="userInp" placeholder="Type your question..." autocomplete="off" aria-label="Type your election question" enterkeyhint="send">
+    <button type="submit" class="send-btn" id="sendBtn" aria-label="Send message">➤</button>
+    <button type="button" class="voice-btn" id="voiceBtn" title="Voice input" aria-label="Start voice input">🎤</button>
+  </form>
+</div>
 
-  <!-- ===== CHAT SCREEN ===== -->
-  <div id="chatScreen" role="main" aria-label="Election Guide Chat">
-    <header class="hdr" role="banner">
-      <div class="h-orb" id="hOrb" aria-hidden="true">
-        <div class="h-orb-r1"></div>
-        <div class="h-orb-r2"></div>
-        <div class="h-orb-c"></div>
-      </div>
-      <div class="h-info">
-        <div class="h-name">Navi</div>
-        <div class="h-status" id="hSt" aria-live="polite">Election Guide</div>
-      </div>
-      <div class="h-ctrls">
-        <button class="h-btn lang-btn" id="langBtn" title="Change language" aria-label="Change language"></button>
-        <button class="h-btn" id="voiceTog" title="Toggle voice output" aria-label="Toggle voice output"
-          aria-pressed="false">🔊</button>
-        <div class="h-ring" aria-hidden="true">
-          <svg viewBox="0 0 38 38">
-            <circle class="h-ring-bg" cx="19" cy="19" r="15" />
-            <circle class="h-ring-f" id="hRF" cx="19" cy="19" r="15" />
-          </svg>
-          <span class="h-ring-t" id="hRT">0%</span>
+<!-- Celebration overlay -->
+<div id="cele" aria-hidden="true" role="presentation"></div>
+
+<script>
+/**
+ * ================================================================
+ * NAVI — Indian Election Guide Agent v3.0
+ * 
+ * @description Conversational election guide for Indian voters
+ * @version 3.0.0
+ * @license MIT
+ * 
+ * Architecture:
+ *   Section 1:  Environment & Particles
+ *   Section 2:  Language Definitions (13 Indian languages)
+ *   Section 3:  UI Translations
+ *   Section 4:  Google Gemini AI Configuration
+ *   Section 5:  Conversation Data (31 nodes, bilingual)
+ *   Section 6:  Query Keyword Matching Engine
+ *   Section 7:  DOM Cache & Application State
+ *   Section 8:  Journey Bar Initialization
+ *   Section 9:  Language Selector
+ *   Section 10: Chat Rendering Engine
+ *   Section 11: Google Service Embedders
+ *   Section 12: Query Processing (3-tier)
+ *   Section 13: Voice System (Web Speech API)
+ *   Section 14: Event Handlers
+ *   Section 15: Celebration & Bootstrap
+ * ================================================================
+ */
+
+'use strict';
+
+/* ============================================================
+   SECTION 1: ENVIRONMENT & PARTICLES
+   ============================================================ */
+
+/** @type {HTMLCanvasElement} */
+const canvas = document.getElementById('particles');
+
+/** Particle field animation — decorative background */
+(function initParticles() {
+  try {
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    
+    let W, H;
+    const particles = [];
+    const PARTICLE_COUNT = 45;
+    
+    function resize() {
+      W = canvas.width = window.innerWidth;
+      H = canvas.height = window.innerHeight;
+    }
+    
+    resize();
+    window.addEventListener('resize', resize, { passive: true });
+    
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+      particles.push({
+        x: Math.random() * 2000,
+        y: Math.random() * 2000,
+        vx: (Math.random() - 0.5) * 0.2,
+        vy: -Math.random() * 0.35 - 0.06,
+        size: Math.random() * 1.6 + 0.3,
+        opacity: Math.random() * 0.2 + 0.04,
+        life: Math.random()
+      });
+    }
+    
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+      for (const p of particles) {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.life -= 0.0006;
+        if (p.y < 0 || p.life <= 0) {
+          p.y = H + 10;
+          p.x = Math.random() * W;
+          p.life = 1;
+        }
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255,153,51,${p.opacity * p.life})`;
+        ctx.fill();
+      }
+      requestAnimationFrame(draw);
+    }
+    
+    draw();
+  } catch (e) {
+    console.warn('Particles init failed:', e.message);
+  }
+})();
+
+/* ============================================================
+   SECTION 2: LANGUAGE DEFINITIONS (13 Indian Languages)
+   ============================================================ */
+
+/**
+ * @typedef {Object} Language
+ * @property {string} code - ISO 639-1 language code
+ * @property {string} native - Native script name
+ * @property {string} latin - Latin script name
+ * @property {string} font - CSS font-family for native script
+ * @property {string} voice - BCP-47 voice code for Speech API
+ */
+
+/** @type {Language[]} */
+const LANGS = [
+  { code: 'en', native: 'English',     latin: 'English',    font: 'inherit',                                voice: 'en-IN' },
+  { code: 'hi', native: 'हिन्दी',       latin: 'Hindi',      font: "'Noto Sans Devanagari',sans-serif",      voice: 'hi-IN' },
+  { code: 'kn', native: 'ಕನ್ನಡ',       latin: 'Kannada',    font: "'Noto Sans Kannada',sans-serif",         voice: 'kn-IN' },
+  { code: 'ta', native: 'தமிழ்',        latin: 'Tamil',      font: "'Noto Sans Tamil',sans-serif",           voice: 'ta-IN' },
+  { code: 'te', native: 'తెలుగు',       latin: 'Telugu',     font: "'Noto Sans Telugu',sans-serif",          voice: 'te-IN' },
+  { code: 'ml', native: 'മലയാളം',      latin: 'Malayalam',  font: "'Noto Sans Malayalam',sans-serif",       voice: 'ml-IN' },
+  { code: 'bn', native: 'বাংলা',        latin: 'Bengali',    font: "'Noto Sans Bengali',sans-serif",         voice: 'bn-IN' },
+  { code: 'gu', native: 'ગુજરાતી',     latin: 'Gujarati',   font: "'Noto Sans Gujarati',sans-serif",        voice: 'gu-IN' },
+  { code: 'mr', native: 'मराठी',        latin: 'Marathi',    font: "'Noto Sans Devanagari',sans-serif",      voice: 'mr-IN' },
+  { code: 'pa', native: 'ਪੰਜਾਬੀ',      latin: 'Punjabi',    font: "'Noto Sans Gurmukhi',sans-serif",        voice: 'pa-IN' },
+  { code: 'or', native: 'ଓଡ଼ିଆ',       latin: 'Odia',       font: "'Noto Sans Oriya',sans-serif",           voice: 'or-IN' },
+  { code: 'as', native: 'অসমীয়া',      latin: 'Assamese',   font: "'Noto Sans Bengali',sans-serif",         voice: 'as-IN' },
+  { code: 'ur', native: 'اردو',         latin: 'Urdu',       font: 'inherit',                                voice: 'ur-IN' }
+];
+
+/** @type {string} Current selected language code */
+let curLang = 'en';
+
+/* ============================================================
+   SECTION 3: UI TRANSLATIONS
+   ============================================================ */
+
+/** @type {Object<string, Object<string, string|string[]>>} */
+const UI = {
+en:{think:'Thinking...',speak:'Speaking...',ready:'Ready',placeholder:'Type your question...',changeLang:'EN',qa:['Register','Voter list','Polling booth','Documents','Election dates','NRI voting','Helpline']},
+hi:{think:'सोच रहा हूँ...',speak:'बोल रहा हूँ...',ready:'तैयार',placeholder:'सवाल लिखें...',changeLang:'HI',qa:['पंजीकरण','मतदाता सूची','मतदान केंद्र','दस्तावेज','चुनाव तारीख','NRI मतदान','हेल्पलाइन']},
+kn:{think:'ಯೋಚಿಸುತ್ತಿದ್ದೇನೆ...',speak:'ಮಾತನಾಡುತ್ತಿದ್ದೇನೆ...',ready:'ಸಿದ್ಧ',placeholder:'ಪ್ರಶ್ನೆ ಟೈಪ್ ಮಾಡಿ...',changeLang:'KN',qa:['ನೋಂದಣಿ','ಮತದಾರ ಪಟ್ಟಿ','ಮತಗಟ್ಟೆ','ದಾಖಲೆಗಳು','ಚುನಾವಣಾ ದಿನಾಂಕ','NRI','ಹೆಲ್ಪ್ಲೈನ್']},
+ta:{think:'யோசிக்கிறேன்...',speak:'பேசுகிறேன்...',ready:'தயார்',placeholder:'கேள்வி டைப் செய்யுங்கள்...',changeLang:'TA',qa:['பதிவு','வாக்காளர் பட்டியல்','வாக்குச்சாவடி','ஆவணங்கள்','தேர்தல் தேதி','NRI','ஹெல்ப்லைன்']},
+te:{think:'ఆలోచిస్తున్నాను...',speak:'మాట్లాడుతున్నాను...',ready:'సిద్ధం',placeholder:'ప్రశ్న టైప్ చేయండి...',changeLang:'TE',qa:['నమోదు','ఓటరు జాబితా','పోలింగ్ బూత్','పత్రాలు','తేదీలు','NRI','హెల్ప్లైన్']},
+ml:{think:'ചിന്തിക്കുന്നു...',speak:'സംസാരിക്കുന്നു...',ready:'തയ്യാർ',placeholder:'ചോദ്യം ടൈപ്പ് ചെയ്യൂ...',changeLang:'ML',qa:['രജിസ്ട്രേഷൻ','വോട്ടർ പട്ടിക','പോളിംഗ് ബൂത്ത്','രേഖകൾ','തീയതി','NRI','ഹെൽപ്ലൈൻ']},
+bn:{think:'ভাবছি...',speak:'বলছি...',ready:'প্রস্তুত',placeholder:'প্রশ্ন টাইপ করুন...',changeLang:'BN',qa:['নিবন্ধন','ভোটার তালিকা','পোলিং বুথ','কাগজপত্র','তারিখ','NRI','হেল্পলাইন']},
+gu:{think:'વિચારી રહ્યો છું...',speak:'બોલી રહ્યો છું...',ready:'તૈયાર',placeholder:'પ્રશ્ન ટાઇપ કરો...',changeLang:'GU',qa:['નોંધણી','મતદાર યાદી','પોલિંગ બૂથ','દસ્તાવેજો','તારીખ','NRI','હેલ્પલાઇન']},
+mr:{think:'विचार करत आहे...',speak:'बोलत आहे...',ready:'तयार',placeholder:'प्रश्न टाइप करा...',changeLang:'MR',qa:['नोंदणी','मतदार यादी','मतदान केंद्र','कागदपत्रे','तारीख','NRI','हेल्पलाइन']},
+pa:{think:'ਸੋਚ ਰਿਹਾ ਹਾਂ...',speak:'ਬੋਲ ਰਿਹਾ ਹਾਂ...',ready:'ਤਿਆਰ',placeholder:'ਸਵਾਲ ਲਿਖੋ...',changeLang:'PA',qa:['ਰਜਿਸਟ੍ਰੇਸ਼ਨ','ਵੋਟਰ ਲਿਸਟ','ਪੋਲਿੰਗ ਬੂਥ','ਦਸਤਾਵੇਜ਼','ਮਿਤੀ','NRI','ਹੈਲਪਲਾਈਨ']},
+or:{think:'ଚିନ୍ତା କରୁଛି...',speak:'କହୁଛି...',ready:'ପ୍ରସ୍ତୁତ',placeholder:'ପ୍ରଶ୍ନ ଟାଇପ୍ କରନ୍ତୁ...',changeLang:'OR',qa:['ପଞ୍ଜୀକରଣ','ଭୋଟର ତାଲିକା','ପୋଲିଂ ବୁଥ୍','ଦଲିଲ୍','ତାରିଖ','NRI','ହେଲ୍ପଲାଇନ୍']},
+as:{think:'ভাবি আছোঁ...',speak:'কৈ আছোঁ...',ready:'প্ৰস্তুত',placeholder:'প্ৰশ্ন টাইপ কৰক...',changeLang:'AS',qa:['পঞ্জীয়ন','ভোটাৰ তালিকা','প\'লিং বুথ','কাগজপত্ৰ','তাৰিখ','NRI','হেল্পলাইন']},
+ur:{think:'سوچ رہا ہوں...',speak:'بول رہا ہوں...',ready:'تیار',placeholder:'سوال لکھیں...',changeLang:'UR',qa:['رجسٹریشن','ووٹر فہرست','پولنگ بوتھ','دستاویزات','تاریخ','NRI','ہیلپ لائن']}
+};
+
+/** Get UI translation for current language with English fallback */
+function t(key) { return UI[curLang]?.[key] ?? UI.en?.[key] ?? key; }
+
+/* ============================================================
+   SECTION 4: GOOGLE GEMINI AI CONFIGURATION
+   ============================================================ */
+
+/**
+ * Google Gemini AI integration for intelligent query resolution
+ * Uses Gemini 2.0 Flash for fast, accurate election-related responses
+ * @see https://ai.google.dev/docs
+ */
+const GEMINI = Object.freeze({
+  /** @type {string} Gemini API endpoint */
+  endpoint: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent',
+  
+  /** @returns {string} API key from session storage */
+  get key() { try { return sessionStorage.getItem('navi_gk') || ''; } catch { return ''; } },
+  /** @param {string} v - API key to store */
+  set key(v) { try { sessionStorage.setItem('navi_gk', v); } catch {} },
+  
+  /** @returns {boolean} Whether API key is available */
+  get ready() { return this.key.length > 10; },
+  
+  /** @type {string} System prompt constraining Gemini to election topics */
+  systemPrompt: 'You are Navi, an Indian Election Guide. ONLY answer about Indian elections, ECI, Voter ID, EVM, VVPAT, NOTA, polling booths, voter registration, electoral rolls, and democratic processes in India. Keep responses under 120 words. Be factual and nonpartisan. Always recommend verifying with ECI (eci.gov.in). Mention relevant ECI forms when applicable. Reference Voter Helpline 1950 for urgent issues. If asked about non-election topics, redirect politely.',
+  
+  /** @type {number} Temperature for balanced responses */
+  temperature: 0.4,
+  
+  /** @type {number} Maximum output tokens */
+  maxTokens: 250
+});
+
+/**
+ * Show API key input modal
+ * @returns {Promise<boolean>} Whether key was successfully provided
+ */
+function showApiKeyModal() {
+  return new Promise(resolve => {
+    if (GEMINI.ready) { resolve(true); return; }
+    
+    const modal = document.createElement('div');
+    modal.className = 'api-modal';
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-label', 'Enable AI Mode');
+    modal.innerHTML = `
+      <div class="api-modal-inner">
+        <h3>Enable AI Mode</h3>
+        <p>Enter your <strong>Google Gemini API key</strong> for intelligent answers to any election question.</p>
+        <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">Get free API key →</a>
+        <input type="password" id="apiKeyInp" placeholder="Paste your API key here..." autocomplete="off" aria-label="Gemini API key">
+        <div class="api-modal-btns">
+          <button type="button" class="skip" id="apiSkip">Skip</button>
+          <button type="button" class="save" id="apiSave">Enable AI</button>
         </div>
-      </div>
-    </header>
-    <div class="j-bar" id="jBar" role="progressbar" aria-label="Journey progress" aria-valuemin="0" aria-valuemax="7"
-      aria-valuenow="0"></div>
-    <main class="chat" id="chat" aria-live="polite" aria-label="Conversation"></main>
-    <div class="voice-wave" id="vWave" aria-hidden="true">
-      <div class="vw-bar"></div>
-      <div class="vw-bar"></div>
-      <div class="vw-bar"></div>
-      <div class="vw-bar"></div>
-      <div class="vw-bar"></div>
-    </div>
-    <div class="choices" id="choices" role="group" aria-label="Response options"></div>
-    <div class="input-area" role="search" aria-label="Ask a question">
-      <label for="userInp" class="sr-only"
-        style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">Ask your election
-        question</label>
-      <input type="text" class="inp" id="userInp" placeholder="Type your question..." autocomplete="off"
-        aria-label="Ask your election question">
-      <button class="send-btn" id="sendBtn" aria-label="Send message">➤</button>
-      <button class="voice-btn" id="voiceBtn" title="Voice input" aria-label="Voice input">🎤</button>
-    </div>
-  </div>
+      </div>`;
+    document.body.appendChild(modal);
+    
+    const inp = modal.querySelector('#apiKeyInp');
+    const saveBtn = modal.querySelector('#apiSave');
+    const skipBtn = modal.querySelector('#apiSkip');
+    
+    inp.focus();
+    
+    const cleanup = (result) => { modal.remove(); resolve(result); };
+    
+    skipBtn.addEventListener('click', () => cleanup(false));
+    saveBtn.addEventListener('click', () => {
+      const v = inp.value.trim();
+      if (v.length > 10) { GEMINI.key = v; cleanup(true); }
+      else { inp.style.borderColor = '#ff4444'; inp.setAttribute('aria-invalid', 'true'); }
+    });
+    inp.addEventListener('keydown', e => {
+      if (e.key === 'Enter') saveBtn.click();
+      if (e.key === 'Escape') cleanup(false);
+    });
+  });
+}
 
-  <div id="cele" aria-hidden="true"></div>
+/**
+ * Query Google Gemini AI for election-related questions
+ * @param {string} query - User's question
+ * @param {string} lang - Current language code
+ * @returns {Promise<string|null>} AI response text or null on failure
+ */
+async function queryGemini(query, lang) {
+  if (!GEMINI.ready) return null;
+  
+  try {
+    const langName = LANGS.find(l => l.code === lang)?.latin || 'English';
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8000);
+    
+    const response = await fetch(`${GEMINI.endpoint}?key=${GEMINI.key}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      signal: controller.signal,
+      body: JSON.stringify({
+        systemInstruction: { parts: [{ text: GEMINI.systemPrompt + `\nRespond in ${langName}.` }] },
+        contents: [{ parts: [{ text: query }] }],
+        generationConfig: { maxOutputTokens: GEMINI.maxTokens, temperature: GEMINI.temperature }
+      })
+    });
+    
+    clearTimeout(timeout);
+    if (!response.ok) return null;
+    
+    const data = await response.json();
+    return data?.candidates?.[0]?.content?.parts?.[0]?.text || null;
+  } catch (e) {
+    if (e.name !== 'AbortError') console.warn('Gemini error:', e.message);
+    return null;
+  }
+}
 
-  <!-- Google Translate Script -->
-  <script>
-    /**
-     * NAVI — Indian Election Guide Agent
-     *
-     * Architecture: Single-page conversational agent with:
-     * - 13 Indian language support with native scripts
-     * - Voice input (Web Speech API) and output (Speech Synthesis)
-     * - Free-text query matching engine
-     * - Branching conversation trees per user context
-     * - Google Services integration (Search, Maps, Calendar, Play, YouTube, Translate, Fonts)
-     * - WCAG 2.1 accessibility compliance
-     * - Client-side only — no data collection
-     *
-     * @author Navi Team
-     * @version 2.0.0
-     */
+/* ============================================================
+   SECTION 5: CONVERSATION DATA (31 nodes, bilingual EN+HI)
+   ============================================================ */
 
-    /* ============================================================
-       SECTION 1: INITIALIZATION & UTILITIES
-       ============================================================ */
+/** Get localized messages from a conversation node */
+function getMsg(node) { return node.msgs[curLang] || node.msgs.en || []; }
 
-    // Google Translate initialization
-    function googleTranslateElementInit() {
-      try {
-        new google.translate.TranslateElement({
-          pageLanguage: 'en',
-          includedLanguages: 'en,hi,kn,ta,te,ml,bn,gu,mr,pa,or,as,ur',
-          layout: google.translate.TranslateElement.InlineLayout.HORIZONTAL,
-          autoDisplay: false
-        }, 'google_translate_element');
-      } catch (e) { /* Translate API not available — graceful fallback */ }
+/** Get localized choices from a conversation node */
+function getCh(node) { return node.choices[curLang] || node.choices.en || []; }
+
+/** @type {Object<string, {step:number, msgs:Object, choices:Object, card?:Object, ytEmbed?:string, mapsEmbed?:boolean, celebrate?:boolean}>} */
+const C = {
+welcome:{step:0,msgs:{en:["Namaste! I'm **Navi** — your personal election companion.","I'll guide you through eligibility, Voter ID, electoral roll, research, and casting your vote on EVM.","Where are you in your voting journey?"],hi:["नमस्ते! मैं **नवी** हूँ — आपकी चुनाव साथी।","पात्रता, वोटर ID, मतदाता सूची, शोध और EVM मतदान — सब में मार्गदर्शन करूंगी।","आप मतदान यात्रा में कहाँ हैं?"]},choices:{en:[{t:"🗳️ First-time voter",n:"first"},{t:"🔄 Already have Voter ID",n:"returning"},{t:"📦 Recently shifted",n:"moved"},{t:"🌍 NRI / Overseas",n:"nri"},{t:"👀 Just exploring",n:"explore"}],hi:[{t:"🗳️ पहली बार मतदाता",n:"first"},{t:"🔄 वोटर ID है",n:"returning"},{t:"📦 पता बदला है",n:"moved"},{t:"🌍 NRI / विदेशी",n:"nri"},{t:"👀 बस देख रहा हूँ",n:"explore"}]}},
+first:{step:0,msgs:{en:["Welcome to the world's largest democracy! Let's confirm eligibility:","✅ Citizen of India\n✅ At least 18 years old as on 1st January\n✅ Ordinarily resident of constituency\n✅ Not disqualified by law","Do these apply to you?"],hi:["विश्व के सबसे बड़े लोकतंत्र में स्वागत!","✅ भारत के नागरिक\n✅ 1 जनवरी को कम से कम 18 वर्ष\n✅ निर्वाचन क्षेत्र के निवासी\n✅ कानून द्वारा अयोग्य नहीं","क्या ये लागू हैं?"]},choices:{en:[{t:"✅ Eligible!",n:"register"},{t:"🤔 Not sure",n:"elig_detail"},{t:"❌ Might have barrier",n:"elig_help"}],hi:[{t:"✅ पात्र हूँ!",n:"register"},{t:"🤔 अनिश्चित",n:"elig_detail"},{t:"❌ बाधा हो सकती है",n:"elig_help"}]}},
+elig_detail:{step:0,msgs:{en:["**Citizenship:** Indian citizen required. NRIs can register too.\n\n**Age:** 18 as on 1st January. Can pre-register.\n\n**Residency:** Must reside in constituency. Only ONE constituency.\n\n**Disqualifications:** Unsound mind or certain convictions."],hi:["**नागरिकता:** भारतीय नागरिक। NRI भी कर सकते हैं।\n\n**आयु:** 1 जनवरी को 18 वर्ष।\n\n**निवास:** क्षेत्र में निवासी। केवल एक क्षेत्र।"]},card:{type:'search',title:"Check Eligibility on ECI",desc:"Visit voters.eci.gov.in",url:'https://www.google.com/search?q=ECI+voter+eligibility+voters.eci.gov.in',icon:'🏛️'},choices:{en:[{t:"✅ Eligible — register!",n:"register"},{t:"🔍 Check ECI portal",n:"eci_portal"}],hi:[{t:"✅ पात्र — पंजीकरण!",n:"register"},{t:"🔍 ECI पोर्टल देखें",n:"eci_portal"}]}},
+elig_help:{step:0,msgs:{en:["Many who think they can't vote actually can. Indian law is inclusive. Even NRIs can register.","Check ECI portal or call Voter Helpline."],hi:["बहुत से लोग जो सोचते हैं कि वे वोट नहीं कर सकते, वास्तव में कर सकते हैं। NRI भी।","ECI पोर्टल या हेल्पलाइन देखें।"]},card:{type:'play',title:"Voter Helpline App",desc:"Check eligibility, register, track",url:'https://play.google.com/store/search?q=voter+helpline+ECI&c=apps',icon:'📱'},choices:{en:[{t:"✅ Eligible!",n:"register"},{t:"❌ Not eligible",n:"not_elig"}],hi:[{t:"✅ पात्र!",n:"register"},{t:"❌ पात्र नहीं",n:"not_elig"}]}},
+not_elig:{step:0,msgs:{en:["Even without voting, strengthen democracy:\n• Help others register\n• Volunteer for awareness drives\n• Report violations via cVIGIL\n• Stay informed for future elections"],hi:["वोट के बिना भी लोकतंत्र मजबूत करें:\n• दूसरों को पंजीकरण में मदद\n• जागरूकता अभियान\n• cVIGIL से उल्लंघन रिपोर्ट"]},choices:{en:[{t:"🔄 Start over",n:"welcome"}],hi:[{t:"🔄 शुरू से",n:"welcome"}]}},
+eci_portal:{step:1,msgs:{en:["**ECI Voter Portal** (voters.eci.gov.in):\n✅ Register (Form 6)\n✅ Update/Correct (Form 8)\n✅ Migrate (Form 8A)\n✅ Link Aadhaar (Form 6B)\n✅ Check electoral roll\n✅ Track status\n\nIntegrates Google Maps for booth search."],hi:["**ECI मतदाता पोर्टल** (voters.eci.gov.in):\n✅ पंजीकरण (फॉर्म 6)\n✅ सुधार (फॉर्म 8)\n✅ स्थानांतरण (फॉर्म 8A)\n✅ आधार लिंक (फॉर्म 6B)\n✅ मतदाता सूची जांच"]},card:{type:'search',title:"ECI Voter Portal",desc:"voters.eci.gov.in",url:'https://www.google.com/search?q=voters.eci.gov.in+voter+portal',icon:'🏛️'},choices:{en:[{t:"✅ Found it!",n:"verify"},{t:"➡️ Continue",n:"verify"}],hi:[{t:"✅ मिल गया!",n:"verify"},{t:"➡️ आगे बढ़ें",n:"verify"}]}},
+register:{step:1,msgs:{en:["Register via **ECI Voter Portal** with **Form 6**.\n\n📄 Age proof (birth certificate, 10th marksheet)\n🏠 Address proof (Aadhaar, utility bill)\n📸 Passport-size photo\n\nOr use **Voter Helpline App** — register, track, search all in one."],hi:["**ECI पोर्टल** पर **फॉर्म 6** से आवेदन।\n📄 आयु प्रमाण\n🏠 पता प्रमाण\n📸 फोटो\n\nया **वोटर हेल्पलाइन ऐप** इस्तेमाल करें।"]},card:{type:'play',title:"Voter Helpline App",desc:"Register, track, search — all in one",url:'https://play.google.com/store/search?q=voter+helpline+ECI&c=apps',icon:'📱'},choices:{en:[{t:"✅ Applied!",n:"epic"},{t:"📋 Documents?",n:"docs"},{t:"❓ BLO?",n:"blo"},{t:"🔗 Link Aadhaar?",n:"aadhaar"}],hi:[{t:"✅ आवेदन किया!",n:"epic"},{t:"📋 दस्तावेज?",n:"docs"},{t:"❓ BLO?",n:"blo"},{t:"🔗 आधार लिंक?",n:"aadhaar"}]}},
+docs:{step:1,msgs:{en:["**Form 6** documents:\n\nIdentity: Aadhaar, Passport, DL, PAN\nAddress: Aadhaar, Utility Bill, Bank Passbook\nAge: Birth Certificate, 10th Marksheet\n\n💡 Aadhaar works as both identity and address proof."],hi:["**फॉर्म 6** दस्तावेज:\n\nपहचान: आधार, पासपोर्ट, DL, PAN\nपता: आधार, बिल, बैंक पासबुक\nआयु: जन्म प्रमाणपत्र, 10वीं मार्कशीट"]},choices:{en:[{t:"✅ Have these!",n:"epic"},{t:"➡️ Continue",n:"epic"}],hi:[{t:"✅ हैं मेरे पास!",n:"epic"},{t:"➡️ आगे बढ़ें",n:"epic"}]}},
+blo:{step:1,msgs:{en:["**BLO (Booth Level Officer)** is assigned to your polling area.\n\nHelps with: registration, voter slips, roll updates, queries.\n\nFind your BLO on Voter Helpline App or ECI portal."],hi:["**BLO (बूथ लेवल अधिकारी)** आपके क्षेत्र के लिए नियुक्त।\n\nमदद: पंजीकरण, पर्ची, सूची अपडेट, प्रश्न।\n\nवोटर हेल्पलाइन ऐप पर खोजें।"]},card:{type:'search',title:"Find Your BLO",desc:"Search on ECI portal",url:'https://www.google.com/search?q=find+BLO+booth+level+officer+ECI',icon:'👤'},choices:{en:[{t:"✅ Found BLO!",n:"epic"},{t:"➡️ Continue",n:"epic"}],hi:[{t:"✅ BLO मिला!",n:"epic"},{t:"➡️ आगे बढ़ें",n:"epic"}]}},
+aadhaar:{step:2,msgs:{en:["Link Aadhaar via **Form 6B** on ECI Portal.\n\n✅ Eliminates duplicates\n✅ Strengthens roll integrity\n✅ Simplifies updates\n\n⚠️ Voluntary — voting rights NOT affected without linking."],hi:["**फॉर्म 6B** से आधार लिंक करें।\n\n✅ डुप्लीकेट हटते\n✅ सूची मजबूत\n✅ अपडेट आसान\n\n⚠️ स्वैच्छिक — वोटिंग अधिकार प्रभावित नहीं।"]},card:{type:'search',title:"Form 6B — Aadhaar Link",desc:"Link on ECI Portal",url:'https://www.google.com/search?q=Form+6B+Aadhaar+link+voter+ID+ECI',icon:'🔗'},choices:{en:[{t:"✅ Done!",n:"verify"},{t:"➡️ Skip",n:"verify"}],hi:[{t:"✅ हो गया!",n:"verify"},{t:"➡️ छोड़ें",n:"verify"}]}},
+epic:{step:2,msgs:{en:["After verification, you'll get **EPIC (Voter ID card)**.\n\nProcessing: 2-4 weeks. Track on Voter Helpline App."],hi:["सत्यापन के बाद **EPIC (वोटर ID)** मिलेगा।\n\n2-4 सप्ताह। वोटर हेल्पलाइन ऐप पर ट्रैक करें।"]},card:{type:'search',title:"Track Voter ID Status",desc:"Check on ECI portal",url:'https://www.google.com/search?q=track+voter+ID+EPIC+status+eci.gov.in',icon:'🔍'},choices:{en:[{t:"✅ Got Voter ID!",n:"verify"},{t:"⏳ Still waiting",n:"verify"}],hi:[{t:"✅ वोटर ID मिला!",n:"verify"},{t:"⏳ इंतज़ार",n:"verify"}]}},
+verify:{step:2,msgs:{en:["**Always verify your name in the electoral roll** before every election.\n\n✅ Name correct\n✅ Photo correct\n✅ Constituency & booth\n✅ Parent's name\n✅ Age & gender\n\nECI portal integrates Google Maps for booth search."],hi:["हर चुनाव से पहले **मतदाता सूची में नाम जांचें**।\n\n✅ नाम सही\n✅ फोटो सही\n✅ क्षेत्र और बूथ\n✅ माता-पिता का नाम"]},card:{type:'search',title:"Check Electoral Roll",desc:"Search on voters.eci.gov.in",url:'https://www.google.com/search?q=check+name+electoral+roll+ECI+voters.eci.gov.in',icon:'📋'},choices:{en:[{t:"✅ Correct!",n:"research"},{t:"⚠️ Needs correction",n:"corrections"},{t:"❌ Name missing",n:"name_missing"}],hi:[{t:"✅ सही है!",n:"research"},{t:"⚠️ सुधार चाहिए",n:"corrections"},{t:"❌ नाम गायब",n:"name_missing"}]}},
+corrections:{step:2,msgs:{en:["Use **Form 8** on ECI Portal for corrections.\n\nCorrect: name, age, address, photo, gender, parent name.\n\nProcessing: 2-3 weeks."],hi:["**फॉर्म 8** से सुधार करें।\n\nनाम, आयु, पता, फोटो, लिंग, माता-पिता नाम।"]},card:{type:'search',title:"Form 8 — Corrections",desc:"File on ECI Portal",url:'https://www.google.com/search?q=ECI+Form+8+correction+voter+ID',icon:'✏️'},choices:{en:[{t:"✅ Done!",n:"research"},{t:"➡️ Continue",n:"research"}],hi:[{t:"✅ हो गया!",n:"research"},{t:"➡️ आगे",n:"research"}]}},
+name_missing:{step:2,msgs:{en:["Don't panic:\n1. Search by **EPIC number**\n2. Recent registration? Wait a few days\n3. Name may have been removed in revision\n4. Re-apply with fresh **Form 6**\n\nCall **Voter Helpline: 1950**"],hi:["घबराइए मत:\n1. **EPIC नंबर** से खोजें\n2. हाल ही में पंजीकरण? प्रतीक्षा करें\n3. संशोधन में नाम हटा\n4. नया **फॉर्म 6** भरें\n\n**हेल्पलाइन: 1950**"]},card:{type:'tel',title:"Call 1950",desc:"Voter Helpline — toll-free",url:'tel:1950',icon:'📞'},choices:{en:[{t:"📞 Call 1950",n:"research"},{t:"📝 Re-apply",n:"register"}],hi:[{t:"📞 1950 कॉल",n:"research"},{t:"📝 दोबारा आवेदन",n:"register"}]}},
+research:{step:3,msgs:{en:["**Make an informed choice!**\n\n👤 Candidates — background, education, criminal record, assets\n📜 Party manifestos\n📊 Incumbent's performance\n📰 ADR / MyNeta for candidate report cards\n\n💡 Check MyNeta.info for candidate records."],hi:["**सूचित चुनाव करें!**\n\n👤 उम्मीदवार — पृष्ठभूमि, शिक्षा, आपराधिक रिकॉर्ड\n📜 घोषणापत्र\n📊 वर्तमान प्रतिनिधि का प्रदर्शन\n📰 ADR / MyNeta\n\n💡 MyNeta.info पर रिकॉर्ड देखें।"]},card:{type:'search',title:"Research — MyNeta",desc:"Candidate records & assets",url:'https://www.google.com/search?q=MyNeta+candidate+details+constituency',icon:'🔍'},choices:{en:[{t:"✅ Researched!",n:"nota"},{t:"📺 ECI YouTube videos",n:"yt_eci"}],hi:[{t:"✅ शोध पूरा!",n:"nota"},{t:"📺 YouTube पर ECI वीडियो",n:"yt_eci"}]}},
+yt_eci:{step:3,msgs:{en:["Official ECI voter awareness videos:"],hi:["ECI के मतदाता जागरूकता वीडियो:"]},ytEmbed:'rjvKGXMP3I0',choices:{en:[{t:"✅ Next step!",n:"nota"}],hi:[{t:"✅ अगला कदम!",n:"nota"}]}},
+nota:{step:4,msgs:{en:["**NOTA — None of the Above**\n\nIf no candidate appeals, press NOTA on EVM (last button).\n\n⚠️ Currently no legal weight — winner still wins. But it sends a message.\n\nPressing NOTA is always better than not voting."],hi:["**NOTA — इनमें से कोई नहीं**\n\nकोई पसंद नहीं तो EVM पर NOTA (आखिरी बटन)।\n\n⚠️ कानूनी प्रभाव नहीं। लेकिन संदेश देता है।\n\nNOTA दबाना न वोट करने से बेहतर।"]},choices:{en:[{t:"🗳️ EVM & VVPAT?",n:"evm"},{t:"✅ Prepare for Election Day!",n:"prepare"}],hi:[{t:"🗳️ EVM और VVPAT?",n:"evm"},{t:"✅ चुनाव दिवस तैयारी!",n:"prepare"}]}},
+evm:{step:4,msgs:{en:["**EVM** has two units:\n🔵 BU (Balloting Unit) — candidate buttons\n🟡 CU (Control Unit) — polling officer operates\n\n**VVPAT** displays your vote 7 seconds for verification."],hi:["**EVM** में दो यूनिट:\n🔵 BU — उम्मीदवार बटन\n🟡 CU — मतदान अधिकारी\n\n**VVPAT** 7 सेकंड वोट दिखाता है।"]},ytEmbed:'LxVJjEb2w2k',choices:{en:[{t:"✅ Let's prepare!",n:"prepare"}],hi:[{t:"✅ तैयारी करें!",n:"prepare"}]}},
+prepare:{step:5,msgs:{en:["**Election Day Checklist:**\n📍 Polling Booth — find via Voter Helpline App\n📋 Voter Slip — BLO delivers\n🪪 ID Proof — EPIC or photo ID (Aadhaar, Passport, DL, PAN)\n⏰ 7 AM to 6 PM\n📱 Phone charged, switch off inside\n\nFind your polling booth on Google Maps:"],hi:["**चुनाव दिवस:**\n📍 मतदान केंद्र — ऐप से खोजें\n📋 मतदाता पर्ची — BLO देगा\n🪪 पहचान — EPIC या फोटो ID\n⏰ सुबह 7 से शाम 6\n📱 फोन चार्ज, बूथ में बंद\n\nGoogle Maps पर बूथ खोजें:"]},mapsEmbed:true,choices:{en:[{t:"✅ Found booth!",n:"checklist"},{t:"📅 Calendar reminder",n:"calendar"},{t:"📱 Voter Helpline App",n:"vh_app"}],hi:[{t:"✅ बूथ मिला!",n:"checklist"},{t:"📅 Calendar रिमाइंडर",n:"calendar"},{t:"📱 वोटर हेल्पलाइन ऐप",n:"vh_app"}]}},
+vh_app:{step:5,msgs:{en:["**Voter Helpline App** — ECI's official app:\n📱 Electoral search\n📱 Online forms\n📱 Complaint tracking\n📱 Candidate profiles\n📱 BLO/ERO contacts\n📱 Election schedule"],hi:["**वोटर हेल्पलाइन ऐप**:\n📱 निर्वाचक खोज\n📱 ऑनलाइन फॉर्म\n📱 शिकायत ट्रैकिंग\n📱 उम्मीदवार प्रोफाइल\n📱 BLO/ERO संपर्क"]},card:{type:'play',title:"Voter Helpline App",desc:"Official ECI app",url:'https://play.google.com/store/search?q=voter+helpline+ECI',icon:'📱'},choices:{en:[{t:"✅ Downloaded!",n:"checklist"}],hi:[{t:"✅ डाउनलोड!",n:"checklist"}]}},
+calendar:{step:5,msgs:{en:["Add Election Day to Google Calendar:"],hi:["Google Calendar में चुनाव दिवस जोड़ें:"]},card:{type:'calendar',title:"Google Calendar Reminder",desc:"Never miss Election Day",url:'https://calendar.google.com/calendar/render?action=TEMPLATE&text=Indian+Election+Day+%F0%9F%97%B3%EF%B8%8F&dates=20260501T070000/20260501T180000&details=Vote!+Carry+Voter+ID+and+voter+slip.&location=Your+Polling+Booth',icon:'📅'},choices:{en:[{t:"✅ Set!",n:"checklist"}],hi:[{t:"✅ सेट!",n:"checklist"}]}},
+checklist:{step:6,msgs:{en:["**Final Checklist:**\n✅ Electoral roll verified\n✅ Polling booth confirmed\n✅ Voter slip received\n✅ ID ready\n✅ Research done\n✅ Route planned\n✅ Phone charged\n\n**Your Rights:**\n⚖️ In line? You CAN still vote\n⚖️ Secret ballot\n⚖️ Report violations via cVIGIL\n⚖️ Call 1950 for issues"],hi:["**अंतिम चेकलिस्ट:**\n✅ मतदाता सूची सत्यापित\n✅ बूथ पुष्ट\n✅ पर्ची प्राप्त\n✅ ID तैयार\n✅ शोध पूरा\n✅ रूट योजना\n✅ फोन चार्ज\n\n**अधिकार:**\n⚖️ कतार में? वोट कर सकते हैं\n⚖️ गुप्त मतदान\n⚖️ cVIGIL से रिपोर्ट\n⚖️ 1950 पर कॉल"]},choices:{en:[{t:"🎉 Ready to vote!",n:"complete"},{t:"📱 cVIGIL?",n:"cvigil"},{t:"📬 Postal ballot?",n:"postal"}],hi:[{t:"🎉 वोट के लिए तैयार!",n:"complete"},{t:"📱 cVIGIL?",n:"cvigil"},{t:"📬 पोस्टल बैलट?",n:"postal"}]}},
+cvigil:{step:6,msgs:{en:["**cVIGIL** — Report violations:\n🚨 Cash/gift distribution, posters, loudspeakers, intimidation\n📸 Photo/video — auto-geotags location\n⏱️ ECI responds within **100 minutes!**"],hi:["**cVIGIL** — उल्लंघन रिपोर्ट:\n🚨 नकद/उपहार, पोस्टर, लाउडस्पीकर, धमकी\n📸 फोटो/वीडियो — स्वतः लोकेशन\n⏱️ ECI **100 मिनट** में जवाब!"]},card:{type:'play',title:"cVIGIL App",desc:"Report violations — 100 min response",url:'https://play.google.com/store/search?q=cVIGIL+ECI',icon:'🚨'},choices:{en:[{t:"✅ Ready!",n:"complete"}],hi:[{t:"✅ तैयार!",n:"complete"}]}},
+postal:{step:6,msgs:{en:["Postal ballot: service voters, 80+, PwD (40%+).\n\nMost voters: **in-person at booth** is standard."],hi:["पोस्टल बैलट: सेवा मतदाता, 80+, दिव्यांग।\n\nअधिकांश: **बूथ पर व्यक्तिगत** मानक।"]},choices:{en:[{t:"🎉 Ready!",n:"complete"}],hi:[{t:"🎉 तैयार!",n:"complete"}]}},
+returning:{step:0,msgs:{en:["Welcome back! Let's verify your registration. Anything changed?"],hi:["वापसी का स्वागत! पंजीकरण सत्यापित करें। कुछ बदला?"]},choices:{en:[{t:"📍 Same address",n:"verify"},{t:"📦 Shifted",n:"moved"},{t:"✏️ Correction needed",n:"corrections"},{t:"🤷 Not sure",n:"verify"}],hi:[{t:"📍 वही पता",n:"verify"},{t:"📦 बदला",n:"moved"},{t:"✏️ सुधार चाहिए",n:"corrections"},{t:"🤷 अनिश्चित",n:"verify"}]}},
+moved:{step:1,msgs:{en:["Update registration using **Form 8A** on ECI Portal.\n\nYou **cannot** vote at a different booth."],hi:["**फॉर्म 8A** से अपडेट करें।\n\nदूसरे बूथ पर वोट **नहीं** कर सकते।"]},card:{type:'search',title:"Form 8A — Migration",desc:"Update constituency",url:'https://www.google.com/search?q=ECI+Form+8A+migration+voters.eci.gov.in',icon:'📝'},choices:{en:[{t:"✅ Updated!",n:"verify"},{t:"➡️ Continue",n:"verify"}],hi:[{t:"✅ अपडेट!",n:"verify"},{t:"➡️ आगे",n:"verify"}]}},
+nri:{step:0,msgs:{en:["**NRI Voter Registration:**\n✅ Indian citizen abroad\n✅ Valid passport\n✅ Not acquired foreign citizenship\n\n1. Fill **Form 6A** at voterportal.eci.gov.in\n2. Upload passport, photo, visa\n3. BLO verifies at Indian address\n4. Vote in person with original passport"],hi:["**NRI मतदाता पंजीकरण:**\n✅ विदेश में भारतीय नागरिक\n✅ वैध पासपोर्ट\n\n1. voterportal.eci.gov.in पर **फॉर्म 6A**\n2. पासपोर्ट, फोटो, वीज़ा अपलोड\n3. BLO सत्यापन\n4. मूल पासपोर्ट से वोट"]},card:{type:'search',title:"NRI Registration — Form 6A",desc:"Apply on voterportal.eci.gov.in",url:'https://www.google.com/search?q=NRI+voter+Form+6A+voterportal.eci.gov.in',icon:'🌍'},choices:{en:[{t:"✅ Applied!",n:"verify"},{t:"📋 NRI documents",n:"nri_docs"},{t:"➡️ Continue",n:"verify"}],hi:[{t:"✅ आवेदन!",n:"verify"},{t:"📋 NRI दस्तावेज",n:"nri_docs"},{t:"➡️ आगे",n:"verify"}]}},
+nri_docs:{step:0,msgs:{en:["NRI docs (Form 6A):\n📸 Passport photo\n📄 Passport pages (photo, address, visa)\n📋 Visa endorsement\n\nSubmit online or at ERO/Indian Mission."],hi:["NRI दस्तावेज:\n📸 फोटो\n📄 पासपोर्ट पेज\n📋 वीज़ा\n\nऑनलाइन या ERO/भारतीय मिशन में।"]},choices:{en:[{t:"✅ Ready!",n:"verify"}],hi:[{t:"✅ तैयार!",n:"verify"}]}},
+explore:{step:0,msgs:{en:["Indian elections in 7 steps:\n\n1. **Eligibility** — Confirm you qualify\n2. **Registration** — Apply for Voter ID\n3. **Verification** — Check electoral roll\n4. **Research** — Study candidates\n5. **Preparation** — Know your booth\n6. **Election Day** — Cast vote on EVM\n7. **After Voting** — Track results\n\nLok Sabha: every 5 years, multiple phases."],hi:["7 चरणों में:\n\n1. **पात्रता** — पुष्टि\n2. **पंजीकरण** — वोटर ID\n3. **सत्यापन** — सूची जांच\n4. **शोध** — उम्मीदवार\n5. **तैयारी** — बूथ जानें\n6. **चुनाव दिवस** — EVM पर वोट\n7. **मतदान बाद** — परिणाम\n\nलोकसभा: हर 5 साल।"]},choices:{en:[{t:"✅ Step by step",n:"first"},{t:"📅 Election dates",n:"key_dates"}],hi:[{t:"✅ कदम दर कदम",n:"first"},{t:"📅 चुनाव तारीखें",n:"key_dates"}]}},
+key_dates:{step:0,msgs:{en:["**Key Dates:**\n📅 25 Jan — National Voters' Day\n📅 Jan — Annual roll revision\n📅 Year-round — Form 6 accepted\n📅 Mar-Apr — ECI announces schedule\n📅 Apr-May — Lok Sabha elections\n📅 Oct — Special summary revision"],hi:["**प्रमुख तारीखें:**\n📅 25 जनवरी — राष्ट्रीय मतदाता दिवस\n📅 जनवरी — वार्षिक संशोधन\n📅 साल भर — फॉर्म 6\n📅 मार्च-अप्रैल — ECI घोषणा\n📅 अप्रैल-मई — लोकसभा\n📅 अक्टूबर — विशेष संशोधन"]},card:{type:'search',title:"Election Schedule",desc:"Check ECI for latest dates",url:'https://www.google.com/search?q=ECI+election+schedule+upcoming+India',icon:'📅'},choices:{en:[{t:"📅 Add to Calendar",n:"calendar"},{t:"➡️ Go through steps",n:"first"}],hi:[{t:"📅 Calendar में जोड़ें",n:"calendar"},{t:"➡️ चरणों से गुज़रें",n:"first"}]}},
+complete:{step:7,msgs:{en:["**Congratulations!** 🎉\n\n✅ Eligibility confirmed\n✅ Registration done\n✅ Electoral roll verified\n✅ Candidates researched\n✅ Booth & documents ready\n✅ Rights known\n\n**97 crore+ voters** — world's largest electorate.\n\nYour vote is your voice. **Jai Hind!** 🇮🇳"],hi:["**बधाई!** 🎉\n\n✅ पात्रता पुष्ट\n✅ पंजीकरण\n✅ सूची सत्यापित\n✅ शोध पूरा\n✅ बूथ तैयार\n✅ अधिकार ज्ञात\n\n**97 करोड़+ मतदाता** — विश्व का सबसे बड़ा समूह।\n\nआपका वोट आपकी आवाज़। **जय हिंद!** 🇮🇳"]},card:{type:'links',title:"Quick Reference",links:[{l:'🏛️ ECI Voter Portal',u:'https://voters.eci.gov.in'},{l:'📞 Helpline: 1950',u:'tel:1950'},{l:'📱 Voter Helpline App',u:'https://play.google.com/store/search?q=voter+helpline+ECI'},{l:'🚨 cVIGIL App',u:'https://play.google.com/store/search?q=cVIGIL+ECI'},{l:'📍 Find Polling Booth',u:'https://www.google.com/maps/search/polling+booth+near+me'},{l:'🔍 Check Electoral Roll',u:'https://www.google.com/search?q=check+name+electoral+roll+ECI'}]},choices:{en:[{t:"🔄 New journey",n:"welcome"}],hi:[{t:"🔄 नई यात्रा",n:"welcome"}]},celebrate:true}
+};
+
+/* ============================================================
+   SECTION 6: QUERY KEYWORD MATCHING ENGINE
+   ============================================================ */
+
+/**
+ * Multilingual keyword → conversation node mapping
+ * @type {Object<string, Object<string, string>>}
+ */
+const QMAP = {
+en:{register:'register',registration:'register','voter id':'epic',epic:'epic','check name':'verify','electoral roll':'verify','voter list':'verify','polling booth':'prepare',booth:'prepare',documents:'docs','id proof':'docs',aadhaar:'aadhaar',nri:'nri',overseas:'nri',nota:'nota',evm:'evm',vvpat:'evm',complaint:'cvigil',cvigil:'cvigil','election date':'key_dates',schedule:'key_dates',blo:'blo',helpline:'helpline',1950:'helpline',postal:'postal',research:'research',candidate:'research',manifesto:'research',calendar:'calendar',reminder:'calendar','how to vote':'prepare','voting process':'prepare'},
+hi:{पंजीकरण:'register','मतदाता पहचान':'epic','वोटर id':'epic','नाम जांच':'verify','मतदाता सूची':'verify','मतदान केंद्र':'prepare',दस्तावेज:'docs',आधार:'aadhaar',nota:'nota',evm:'evm',शिकायत:'cvigil','चुनाव तारीख':'key_dates',बीएलओ:'blo',हेल्पलाइन:'helpline',1950:'helpline',पोस्टल:'postal',शोध:'research',उम्मीदवार:'research',कैलेंडर:'calendar'},
+kn:{ನೋಂದಣಿ:'register','ವೋಟರ್ id':'epic','ಮತದಾರ ಪಟ್ಟಿ':'verify','ಮತಗಟ್ಟೆ':'prepare',ದಾಖಲೆ:'docs','ಆಧಾರ್':'aadhaar',evm:'evm','ಚುನಾವಣಾ ದಿನಾಂಕ':'key_dates','ಹೆಲ್ಪ್ಲೈನ್':'helpline'},
+ta:{பதிவு:'register','வாக்காளர் பட்டியல்':'verify','வாக்குச்சாவடி':'prepare',ஆவணம்:'docs','ஆதார்':'aadhaar',evm:'evm','தேர்தல் தேதி':'key_dates','ஹெல்ப்லைன்':'helpline'},
+te:{నమోదు:'register','ఓటరు జాబితా':'verify','పోలింగ్ బూత్':'prepare',పత్రాలు:'docs','ఓటర్ id':'epic','ఆధార్':'aadhaar',evm:'evm','ఎన్నికల తేదీ':'key_dates','హెల్ప్లైన్':'helpline'},
+ml:{രജിസ്ട്രേഷൻ:'register','വോട്ടർ പട്ടിക':'verify','പോളിംഗ് ബൂത്ത്':'prepare','രേഖകൾ':'docs','ആധാർ':'aadhaar',evm:'evm','തെരഞ്ഞെടുപ്പ് തീയതി':'key_dates','ഹെൽപ്ലൈൻ':'helpline'}
+};
+
+/* ============================================================
+   SECTION 7: DOM CACHE & APPLICATION STATE
+   ============================================================ */
+
+/** Cached DOM references — queried once, reused everywhere */
+const DOM = Object.freeze({
+  chat:      document.getElementById('chat'),
+  choices:   document.getElementById('choices'),
+  hOrb:      document.getElementById('hOrb'),
+  hSt:       document.getElementById('hSt'),
+  hRF:       document.getElementById('hRF'),
+  hRT:       document.getElementById('hRT'),
+  userInp:   document.getElementById('userInp'),
+  sendBtn:   document.getElementById('sendBtn'),
+  voiceBtn:  document.getElementById('voiceBtn'),
+  voiceTog:  document.getElementById('voiceTog'),
+  langBtn:   document.getElementById('langBtn'),
+  aiTog:     document.getElementById('aiTog'),
+  jBar:      document.getElementById('jBar'),
+  vWave:     document.getElementById('vWave'),
+  cele:      document.getElementById('cele'),
+  langSel:   document.getElementById('langSel'),
+  chatScreen:document.getElementById('chatScreen'),
+  lsGrid:    document.getElementById('lsGrid'),
+  inputForm: document.getElementById('inputForm')
+});
+
+/** Journey step names for progress bar */
+const STEPS = Object.freeze(['Eligible','Register','Verify','Research','Prepare','Vote Day','Done']);
+
+/** Total number of journey steps */
+const TOTAL = 7;
+
+/** Application state */
+const state = {
+  curProg: 0,
+  voiceOn: false,
+  isRecording: false,
+  recognition: null,
+  synth: window.speechSynthesis
+};
+
+/* ============================================================
+   SECTION 8: JOURNEY BAR INITIALIZATION
+   ============================================================ */
+
+/** Build journey progress dots from STEPS array */
+(function initJourneyBar() {
+  const frag = document.createDocumentFragment();
+  STEPS.forEach((label, i) => {
+    if (i > 0) {
+      const line = document.createElement('div');
+      line.className = 'j-line';
+      frag.appendChild(line);
     }
+    const dot = document.createElement('div');
+    dot.className = 'j-dot';
+    dot.dataset.l = label;
+    frag.appendChild(dot);
+  });
+  DOM.jBar.appendChild(frag);
+})();
 
-    // Particle field animation
-    (function () {
-      const c = document.getElementById('particles'), x = c.getContext('2d');
-      let W, H, P = [];
-      function resize() { W = c.width = innerWidth; H = c.height = innerHeight }
-      resize(); addEventListener('resize', resize);
-      for (let i = 0; i < 45; i++)P.push({
-        x: Math.random() * 2e3, y: Math.random() * 2e3,
-        vx: (Math.random() - .5) * .2, vy: -Math.random() * .35 - .06,
-        s: Math.random() * 1.6 + .3, o: Math.random() * .2 + .04, l: Math.random()
-      });
-      (function draw() {
-        x.clearRect(0, 0, W, H);
-        P.forEach(p => {
-          p.x += p.vx; p.y += p.vy; p.l -= .0006;
-          if (p.y < 0 || p.l <= 0) { p.y = H + 10; p.x = Math.random() * W; p.l = 1 }
-          x.beginPath(); x.arc(p.x, p.y, p.s, 0, Math.PI * 2);
-          x.fillStyle = `rgba(255,153,51,${p.o * p.l})`; x.fill();
-        });
-        requestAnimationFrame(draw);
-      })();
-    })();
+/* ============================================================
+   SECTION 9: LANGUAGE SELECTOR
+   ============================================================ */
 
-    /* ============================================================
-       SECTION 2: LANGUAGE DEFINITIONS
-       ============================================================ */
+/** Build language selection cards */
+(function initLangSelector() {
+  const frag = document.createDocumentFragment();
+  LANGS.forEach(lang => {
+    const card = document.createElement('div');
+    card.className = 'ls-card';
+    card.setAttribute('role', 'option');
+    card.setAttribute('tabindex', '0');
+    card.setAttribute('aria-label', `${lang.latin} — ${lang.native}`);
+    card.innerHTML = `<span class="native" style="font-family:${lang.font}">${lang.native}</span><span class="latin">${lang.latin}</span>`;
+    card.addEventListener('click', () => selectLang(lang.code));
+    card.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectLang(lang.code); }
+    });
+    frag.appendChild(card);
+  });
+  DOM.lsGrid.appendChild(frag);
+})();
 
-    const LANGS = [
-      { code: 'en', native: 'English', latin: 'English', font: 'inherit', voice: 'en-IN' },
-      { code: 'hi', native: 'हिन्दी', latin: 'Hindi', font: "'Noto Sans Devanagari',sans-serif", voice: 'hi-IN' },
-      { code: 'kn', native: 'ಕನ್ನಡ', latin: 'Kannada', font: "'Noto Sans Kannada',sans-serif", voice: 'kn-IN' },
-      { code: 'ta', native: 'தமிழ்', latin: 'Tamil', font: "'Noto Sans Tamil',sans-serif", voice: 'ta-IN' },
-      { code: 'te', native: 'తెలుగు', latin: 'Telugu', font: "'Noto Sans Telugu',sans-serif", voice: 'te-IN' },
-      { code: 'ml', native: 'മലയാളം', latin: 'Malayalam', font: "'Noto Sans Malayalam',sans-serif", voice: 'ml-IN' },
-      { code: 'bn', native: 'বাংলা', latin: 'Bengali', font: "'Noto Sans Bengali',sans-serif", voice: 'bn-IN' },
-      { code: 'gu', native: 'ગુજરાતી', latin: 'Gujarati', font: "'Noto Sans Gujarati',sans-serif", voice: 'gu-IN' },
-      { code: 'mr', native: 'मराठी', latin: 'Marathi', font: "'Noto Sans Devanagari',sans-serif", voice: 'mr-IN' },
-      { code: 'pa', native: 'ਪੰਜਾਬੀ', latin: 'Punjabi', font: "'Noto Sans Gurmukhi',sans-serif", voice: 'pa-IN' },
-      { code: 'or', native: 'ଓଡ଼ିଆ', latin: 'Odia', font: "'Noto Sans Oriya',sans-serif", voice: 'or-IN' },
-      { code: 'as', native: 'অসমীয়া', latin: 'Assamese', font: "'Noto Sans Bengali',sans-serif", voice: 'as-IN' },
-      { code: 'ur', native: 'اردو', latin: 'Urdu', font: 'inherit', voice: 'ur-IN' }
-    ];
+/**
+ * Handle language selection and transition to chat
+ * @param {string} code - Language code
+ */
+function selectLang(code) {
+  curLang = code;
+  document.documentElement.lang = code;
+  DOM.langSel.classList.add('exit');
+  DOM.chatScreen.classList.add('active');
+  DOM.userInp.placeholder = t('placeholder');
+  DOM.langBtn.textContent = t('changeLang');
+  setTimeout(() => showNode('welcome'), 900);
+}
 
-    let curLang = 'en';
+/* ============================================================
+   SECTION 10: CHAT RENDERING ENGINE
+   ============================================================ */
 
-    /* ============================================================
-       SECTION 3: UI TRANSLATIONS
-       ============================================================ */
+/**
+ * Promise-based delay
+ * @param {number} ms - Milliseconds to wait
+ * @returns {Promise<void>}
+ */
+const sleep = ms => new Promise(r => setTimeout(r, ms));
 
-    const UI = {
-      en: { start: 'Begin Your Journey', sub: 'Your personal guide to India\'s election process', label: 'Choose Your Language', think: 'Thinking...', speak: 'Speaking...', ready: 'Ready', placeholder: 'Type your question...', send: 'Send', voice: 'Voice input', voiceOn: 'Voice ON', voiceOff: 'Voice OFF', changeLang: 'EN', qa: ['How to register?', 'Check voter list', 'Find polling booth', 'Documents needed', 'Election dates', 'NRI voting', 'Contact helpline'] },
-      hi: { start: 'अपनी यात्रा शुरू करें', sub: 'भारत के चुनाव प्रक्रिया की आपकी व्यक्तिगत मार्गदर्शिका', label: 'अपनी भाषा चुनें', think: 'सोच रहा हूँ...', speak: 'बोल रहा हूँ...', ready: 'तैयार', placeholder: 'अपना सवाल लिखें...', send: 'भेजें', voice: 'आवाज़', voiceOn: 'आवाज़ चालू', voiceOff: 'आवाज़ बंद', changeLang: 'HI', qa: ['पंजीकरण कैसे करें?', 'मतदाता सूची जांचें', 'मतदान केंद्र खोजें', 'ज़रूरी दस्तावेज', 'चुनाव की तारीख', 'NRI मतदान', 'हेल्पलाइन'] },
-      kn: { start: 'ನಿಮ್ಮ ಪ್ರಯಾಣ ಪ್ರಾರಂಭಿಸಿ', sub: 'ಭಾರತದ ಚುನಾವಣಾ ಪ್ರಕ್ರಿಯೆಯ ನಿಮ್ಮ ವೈಯಕ್ತಿಕ ಮಾರ್ಗದರ್ಶಿ', label: 'ನಿಮ್ಮ ಭಾಷೆ ಆಯ್ಕೆಮಾಡಿ', think: 'ಯೋಚಿಸುತ್ತಿದ್ದೇನೆ...', speak: 'ಮಾತನಾಡುತ್ತಿದ್ದೇನೆ...', ready: 'ಸಿದ್ಧ', placeholder: 'ನಿಮ್ಮ ಪ್ರಶ್ನೆ ಟೈಪ್ ಮಾಡಿ...', send: 'ಕಳುಹಿಸಿ', voice: 'ಧ್ವನಿ', voiceOn: 'ಧ್ವನಿ ಆನ್', voiceOff: 'ಧ್ವನಿ ಆಫ್', changeLang: 'KN', qa: ['ನೋಂದಣಿ ಹೇಗೆ?', 'ಮತದಾರ ಪಟ್ಟಿ', 'ಮತಗಟ್ಟೆ ಹುಡುಕಿ', 'ಅಗತ್ಯ ದಾಖಲೆಗಳು', 'ಚುನಾವಣಾ ದಿನಾಂಕ', 'NRI ಮತದಾನ', 'ಹೆಲ್ಪ್‌ಲೈನ್'] },
-      ta: { start: 'உங்கள் பயணத்தைத் தொடங்குங்கள்', sub: 'இந்திய தேர்தல் செயல்முறைக்கான உங்கள் வழிகாட்டி', label: 'உங்கள் மொழியைத் தேர்ந்தெடுக்கவும்', think: 'யோசிக்கிறேன்...', speak: 'பேசுகிறேன்...', ready: 'தயார்', placeholder: 'உங்கள் கேள்வியை டைப் செய்யுங்கள்...', send: 'அனுப்பு', voice: 'குரல்', voiceOn: 'குரல் ஆன்', voiceOff: 'குரல் ஆஃப்', changeLang: 'TA', qa: ['பதிவு எப்படி?', 'வாக்காளர் பட்டியல்', 'வாக்குச்சாவடி', 'ஆவணங்கள்', 'தேர்தல் தேதிகள்', 'NRI வாக்கு', 'ஹெல்ப்லைன்'] },
-      te: { start: 'మీ ప్రయాణం ప్రారంభించండి', sub: 'భారత ఎన్నికల ప్రక్రియకు మీ వ్యక్తిగత గైడ్', label: 'మీ భాషను ఎంచుకోండి', think: 'ఆలోచిస్తున్నాను...', speak: 'మాట్లాడుతున్నాను...', ready: 'సిద్ధం', placeholder: 'మీ ప్రశ్న టైప్ చేయండి...', send: 'పంపు', voice: 'వాయిస్', voiceOn: 'వాయిస్ ఆన్', voiceOff: 'వాయిస్ ఆఫ్', changeLang: 'TE', qa: ['నమోదు ఎలా?', 'ఓటరు జాబితా', 'పోలింగ్ బూత్', 'పత్రాలు', 'ఎన్నికల తేదీలు', 'NRI ఓటు', 'హెల్ప్‌లైన్'] },
-      ml: { start: 'നിങ്ങളുടെ യാത്ര ആരംഭിക്കൂ', sub: 'ഇന്ത്യൻ തെരഞ്ഞെടുപ്പ് പ്രക്രിയയുടെ നിങ്ങളുടെ ഗൈഡ്', label: 'നിങ്ങളുടെ ഭാഷ തിരഞ്ഞെടുക്കൂ', think: 'ചിന്തിക്കുന്നു...', speak: 'സംസാരിക്കുന്നു...', ready: 'തയ്യാർ', placeholder: 'നിങ്ങളുടെ ചോദ്യം ടൈപ്പ് ചെയ്യൂ...', send: 'അയക്കൂ', voice: 'ശബ്ദം', voiceOn: 'ശബ്ദം ഓൺ', voiceOff: 'ശബ്ദം ഓഫ്', changeLang: 'ML', qa: ['രജിസ്ട്രേഷൻ?', 'വോട്ടർ പട്ടിക', 'പോളിംഗ് ബൂത്ത്', 'രേഖകൾ', 'തെരഞ്ഞെടുപ്പ് തീയതി', 'NRI വോട്ട്', 'ഹെൽപ്‌ലൈൻ'] },
-      bn: { start: 'আপনার যাত্রা শুরু করুন', sub: 'ভারতের নির্বাচন প্রক্রিয়ার আপনার গাইড', label: 'আপনার ভাষা বেছে নিন', think: 'ভাবছি...', speak: 'বলছি...', ready: 'প্রস্তুত', placeholder: 'আপনার প্রশ্ন টাইপ করুন...', send: 'পাঠান', voice: 'কণ্ঠ', voiceOn: 'কণ্ঠ চালু', voiceOff: 'কণ্ঠ বন্ধ', changeLang: 'BN', qa: ['নিবন্ধন?', 'ভোটার তালিকা', 'পোলিং বুথ', 'কাগজপত্র', 'নির্বাচনের তারিখ', 'NRI ভোট', 'হেল্পলাইন'] },
-      gu: { start: 'તમારી યાત્રા શરૂ કરો', sub: 'ભારતની ચૂંટણી પ્રક્રિયાની તમારી માર્ગદર્શિકા', label: 'તમારી ભાષા પસંદ કરો', think: 'વિચારી રહ્યો છું...', speak: 'બોલી રહ્યો છું...', ready: 'તૈયાર', placeholder: 'તમારો પ્રશ્ન ટાઇપ કરો...', send: 'મોકલો', voice: 'અવાજ', voiceOn: 'અવાજ ચાલુ', voiceOff: 'અવાજ બંધ', changeLang: 'GU', qa: ['નોંધણી?', 'મતદાર યાદી', 'પોલિંગ બૂથ', 'દસ્તાવેજો', 'ચૂંટણી તારીખ', 'NRI મત', 'હેલ્પલાઇન'] },
-      mr: { start: 'तुमचा प्रवास सुरू करा', sub: 'भारताच्या निवडणूक प्रक्रियेचा तुमचा मार्गदर्शक', label: 'तुमची भाषा निवडा', think: 'विचार करत आहे...', speak: 'बोलत आहे...', ready: 'तयार', placeholder: 'तुमचा प्रश्न टाइप करा...', send: 'पाठवा', voice: 'आवाज', voiceOn: 'आवाज चालू', voiceOff: 'आवाज बंद', changeLang: 'MR', qa: ['नोंदणी?', 'मतदार यादी', 'मतदान केंद्र', 'कागदपत्रे', 'निवडणूक तारीख', 'NRI मत', 'हेल्पलाइन'] },
-      pa: { start: 'ਆਪਣਾ ਸਫ਼ਰ ਸ਼ੁਰੂ ਕਰੋ', sub: 'ਭਾਰਤ ਦੀ ਚੋਣ ਪ੍ਰਕਿਰਿਆ ਦਾ ਤੁਹਾਡਾ ਗਾਈਡ', label: 'ਆਪਣੀ ਭਾਸ਼ਾ ਚੁਣੋ', think: 'ਸੋਚ ਰਿਹਾ ਹਾਂ...', speak: 'ਬੋਲ ਰਿਹਾ ਹਾਂ...', ready: 'ਤਿਆਰ', placeholder: 'ਆਪਣਾ ਸਵਾਲ ਲਿਖੋ...', send: 'ਭੇਜੋ', voice: 'ਆਵਾਜ਼', voiceOn: 'ਆਵਾਜ਼ ਚਾਲੂ', voiceOff: 'ਆਵਾਜ਼ ਬੰਦ', changeLang: 'PA', qa: ['ਰਜਿਸਟ੍ਰੇਸ਼ਨ?', 'ਵੋਟਰ ਲਿਸਟ', 'ਪੋਲਿੰਗ ਬੂਥ', 'ਦਸਤਾਵੇਜ਼', 'ਚੋਣ ਮਿਤੀ', 'NRI ਵੋਟ', 'ਹੈਲਪਲਾਈਨ'] },
-      or: { start: 'ଆପଣଙ୍କ ଯାତ୍ରା ଆରମ୍ଭ କରନ୍ତୁ', sub: 'ଭାରତର ନିର୍ବାଚନ ପ୍ରକ୍ରିୟାର ଆପଣଙ୍କ ଗାଇଡ୍', label: 'ଆପଣଙ୍କ ଭାଷା ବାଛନ୍ତୁ', think: 'ଚିନ୍ତା କରୁଛି...', speak: 'କହୁଛି...', ready: 'ପ୍ରସ୍ତୁତ', placeholder: 'ଆପଣଙ୍କ ପ୍ରଶ୍ନ ଟାଇପ୍ କରନ୍ତୁ...', send: 'ପଠାନ୍ତୁ', voice: 'ସ୍ୱର', voiceOn: 'ସ୍ୱର ଅନ୍', voiceOff: 'ସ୍ୱର ଅଫ୍', changeLang: 'OR', qa: ['ପଞ୍ଜୀକରଣ?', 'ଭୋଟର ତାଲିକା', 'ପୋଲିଂ ବୁଥ୍', 'ଦଲିଲ୍', 'ନିର୍ବାଚନ ତାରିଖ', 'NRI ଭୋଟ୍', 'ହେଲ୍ପଲାଇନ୍'] },
-      as: { start: 'আপোনাৰ যাত্ৰা আৰম্ভ কৰক', sub: 'ভাৰতৰ নিৰ্বাচন প্ৰক্ৰিয়াৰ আপোনাৰ গাইড', label: 'আপোনাৰ ভাষা বাছক', think: 'ভাবি আছোঁ...', speak: 'কৈ আছোঁ...', ready: 'প্ৰস্তুত', placeholder: 'আপোনাৰ প্ৰশ্ন টাইপ কৰক...', send: 'পঠিয়াওক', voice: 'কণ্ঠ', voiceOn: 'কণ্ঠ অন', voiceOff: 'কণ্ঠ অফ', changeLang: 'AS', qa: ['পঞ্জীয়ন?', 'ভোটাৰ তালিকা', 'প\'লিং বুথ', 'কাগজপত্ৰ', 'নিৰ্বাচনৰ তাৰিখ', 'NRI ভোট', 'হেল্পলাইন'] },
-      ur: { start: 'اپنا سفر شروع کریں', sub: 'بھارت کے انتخابی عمل کی آپ کی رہنمائی', label: 'اپنی زبان منتخب کریں', think: 'سوچ رہا ہوں...', speak: 'بول رہا ہوں...', ready: 'تیار', placeholder: 'اپنا سوال لکھیں...', send: 'بھیجیں', voice: 'آواز', voiceOn: 'آواز آن', voiceOff: 'آواز آف', changeLang: 'UR', qa: ['رجسٹریشن؟', 'ووٹر فہرست', 'پولنگ بوتھ', 'دستاویزات', 'انتخابات کی تاریخ', 'NRI ووٹ', 'ہیلپ لائن'] }
+/** Scroll chat container to bottom */
+const scrollChat = () => { DOM.chat.scrollTop = DOM.chat.scrollHeight; };
+
+/**
+ * Update header status text
+ * @param {string} text - Status text
+ * @param {boolean} isActive - Whether to highlight
+ */
+function setStatus(text, isActive) {
+  DOM.hSt.textContent = text;
+  DOM.hSt.classList.toggle('on', isActive);
+}
+
+/**
+ * Update journey progress ring and dots
+ * @param {number} step - Current step index (0-7)
+ */
+function updateProgress(step) {
+  if (step === undefined) return;
+  state.curProg = Math.max(state.curProg, step);
+  const pct = Math.round((state.curProg / TOTAL) * 100);
+  DOM.hRT.textContent = pct + '%';
+  DOM.hRF.style.strokeDashoffset = 94 - (94 * pct / 100);
+  DOM.jBar.setAttribute('aria-valuenow', state.curProg);
+  
+  document.querySelectorAll('.j-dot').forEach((dot, i) => {
+    dot.classList.toggle('active', i === state.curProg);
+    dot.classList.toggle('done', i < state.curProg);
+  });
+  document.querySelectorAll('.j-line').forEach((line, i) => {
+    line.classList.toggle('done', i < state.curProg);
+  });
+}
+
+/** Show typing indicator animation */
+async function showTyping() {
+  DOM.hOrb.classList.add('thinking');
+  setStatus(t('think'), true);
+  
+  const el = document.createElement('div');
+  el.className = 'typ';
+  el.setAttribute('aria-label', 'Navi is thinking');
+  el.innerHTML = '<div class="msg-av" aria-hidden="true">✦</div><div class="typ-dots"><div class="typ-dot"></div><div class="typ-dot"></div><div class="typ-dot"></div></div>';
+  DOM.chat.appendChild(el);
+  scrollChat();
+  await sleep(450 + Math.random() * 350);
+  el.remove();
+}
+
+/**
+ * Render text character-by-character with markdown support
+ * @param {HTMLElement} container - Target element
+ * @param {string} text - Raw text with markdown
+ * @param {number} [speed=14] - Typing speed in ms per character
+ */
+async function typeText(container, text, speed = 14) {
+  const html = text
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\_(.*?)\_/g, '<em>$1</em>')
+    .replace(/\n/g, '<br>');
+  
+  let buffer = '';
+  let i = 0;
+  
+  DOM.hOrb.classList.add('thinking');
+  setStatus(t('speak'), true);
+  
+  while (i < html.length) {
+    if (html[i] === '<') {
+      const close = html.indexOf('>', i);
+      buffer += html.substring(i, close + 1);
+      i = close + 1;
+    } else {
+      buffer += html[i];
+      i++;
+      container.innerHTML = buffer;
+      scrollChat();
+      await sleep(speed + Math.random() * 6);
+    }
+  }
+  
+  container.innerHTML = html;
+  DOM.hOrb.classList.remove('thinking');
+  setStatus(t('ready'), false);
+  
+  if (state.voiceOn) speakText(text);
+}
+
+/**
+ * Add agent message with typing animation
+ * @param {string} text - Message text with markdown
+ */
+async function addMsg(text) {
+  await showTyping();
+  const wrapper = document.createElement('div');
+  wrapper.className = 'msg agent';
+  wrapper.setAttribute('role', 'article');
+  wrapper.innerHTML = '<div class="msg-av" aria-hidden="true">✦</div><div class="bub"></div>';
+  DOM.chat.appendChild(wrapper);
+  scrollChat();
+  await typeText(wrapper.querySelector('.bub'), text);
+  await sleep(100);
+}
+
+/**
+ * Add response choice buttons
+ * @param {Array<{t:string, n:string}>} choices - Choice objects
+ */
+function addChoices(choices) {
+  DOM.choices.innerHTML = '';
+  const frag = document.createDocumentFragment();
+  
+  choices.forEach((choice, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'ch';
+    btn.textContent = choice.t;
+    btn.style.animationDelay = (i * 0.06) + 's';
+    btn.setAttribute('aria-label', choice.t);
+    
+    btn.addEventListener('click', async () => {
+      DOM.choices.querySelectorAll('button').forEach(b => b.disabled = true);
+      btn.classList.add('sel');
+      
+      const userMsg = document.createElement('div');
+      userMsg.className = 'msg user';
+      userMsg.setAttribute('role', 'article');
+      userMsg.innerHTML = '<div class="msg-av" aria-hidden="true">You</div><div class="bub"></div>';
+      userMsg.querySelector('.bub').textContent = choice.t;
+      DOM.chat.appendChild(userMsg);
+      scrollChat();
+      
+      await sleep(300);
+      DOM.choices.innerHTML = '';
+      await sleep(150);
+      showNode(choice.n);
+    });
+    
+    frag.appendChild(btn);
+  });
+  
+  DOM.choices.appendChild(frag);
+  if (choices.length > 0) setTimeout(() => DOM.choices.querySelector('.ch')?.focus(), 100);
+}
+
+/** Add quick action buttons below choices */
+function addQuickActions() {
+  const existing = document.querySelector('.qa');
+  if (existing) existing.remove();
+  
+  const qaItems = t('qa');
+  if (!qaItems?.length) return;
+  
+  const wrapper = document.createElement('div');
+  wrapper.className = 'qa';
+  wrapper.setAttribute('role', 'toolbar');
+  wrapper.setAttribute('aria-label', 'Quick action buttons');
+  
+  qaItems.forEach(label => {
+    const btn = document.createElement('button');
+    btn.className = 'qa-btn';
+    btn.textContent = label;
+    btn.setAttribute('aria-label', label);
+    btn.addEventListener('click', () => handleQuery(label));
+    wrapper.appendChild(btn);
+  });
+  
+  DOM.choices.parentElement.insertBefore(wrapper, DOM.choices);
+}
+
+/**
+ * Navigate to a conversation node and render all content
+ * @param {string} id - Node identifier key
+ */
+async function showNode(id) {
+  const node = C[id];
+  if (!node) { console.warn('Node not found:', id); return; }
+  
+  updateProgress(node.step);
+  
+  for (const msg of getMsg(node)) {
+    await addMsg(msg);
+  }
+  
+  if (node.ytEmbed) addYouTubeEmbed(node.ytEmbed);
+  if (node.mapsEmbed) addMapsEmbed();
+  if (node.card) addGoogleServiceCard(node.card);
+  if (node.celebrate) celebrate();
+  
+  addChoices(getCh(node));
+  addQuickActions();
+}
+
+/* ============================================================
+   SECTION 11: GOOGLE SERVICE EMBEDDERS
+   ============================================================ */
+
+/**
+ * Add Google service link card (Search, Maps, Calendar, Play, Phone)
+ * @param {Object} card - Card configuration
+ * @param {string} card.type - Service type
+ * @param {string} card.title - Display title
+ * @param {string} card.desc - Description text
+ * @param {string} card.url - Target URL
+ * @param {string} card.icon - Emoji icon
+ */
+function addGoogleServiceCard(card) {
+  let el;
+  
+  if (card.type === 'links') {
+    el = document.createElement('div');
+    el.className = 'rc-links';
+    el.setAttribute('role', 'navigation');
+    el.setAttribute('aria-label', card.title);
+    el.innerHTML = `<div class="rc-links-head"><div class="rc-ico" aria-hidden="true">🔗</div><h4>${card.title}</h4></div>`;
+    
+    card.links.forEach(link => {
+      const a = document.createElement('a');
+      a.className = 'rc-link';
+      a.href = link.u;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      a.innerHTML = link.l + '<span aria-hidden="true">↗</span>';
+      el.appendChild(a);
+    });
+  } else {
+    const serviceLabels = {
+      search: 'Google Search',
+      maps: 'Google Maps',
+      calendar: 'Google Calendar',
+      play: 'Google Play Store',
+      yt: 'YouTube',
+      tel: 'Phone'
     };
+    
+    el = document.createElement('a');
+    el.className = 'rc';
+    el.href = card.url;
+    el.target = '_blank';
+    el.rel = 'noopener noreferrer';
+    el.setAttribute('aria-label', `${card.title} — Opens ${serviceLabels[card.type] || 'link'}`);
+    el.innerHTML = `<div class="rc-ico" aria-hidden="true">${card.icon || '🔗'}</div><div class="rc-body"><h4>${card.title}</h4><p>${card.desc}</p><span class="rc-tag">${serviceLabels[card.type] || 'Link'} ↗</span></div><div class="rc-arr" aria-hidden="true">→</div>`;
+  }
+  
+  DOM.chat.appendChild(el);
+  scrollChat();
+}
 
-    /* ============================================================
-       SECTION 4: CONVERSATION ENGINE DATA
-       ============================================================ */
+/**
+ * Add embedded YouTube video player (Google Service)
+ * @param {string} videoId - YouTube video ID
+ */
+function addYouTubeEmbed(videoId) {
+  const el = document.createElement('div');
+  el.className = 'yt-embed';
+  el.setAttribute('aria-label', 'Embedded YouTube video');
+  el.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}" title="ECI Voter Awareness Video" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>`;
+  DOM.chat.appendChild(el);
+  scrollChat();
+}
 
-    // Helper: get localized text from a node
-    function getMsg(node) { return node.msgs[curLang] || node.msgs.en || [] }
-    function getChoices(node) { return node.choices[curLang] || node.choices.en || [] }
-    function t(key) { return (UI[curLang] && UI[curLang][key]) || (UI.en && UI.en[key]) || key }
+/** Add embedded Google Maps for polling booth search (Google Service) */
+function addMapsEmbed() {
+  const el = document.createElement('div');
+  el.className = 'maps-embed';
+  el.setAttribute('aria-label', 'Google Maps — Find your polling booth');
+  el.innerHTML = `<iframe src="https://www.google.com/maps/embed?pb=!1m16!1m12!1m3!1d1000000!2d77.209!3d28.6139!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!2m1!1spolling+booth+near+me" title="Find Polling Booth" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>`;
+  DOM.chat.appendChild(el);
+  scrollChat();
+}
 
-    const C = {
-      welcome: {
-        step: 0, msgs: {
-          en: ["Namaste! I'm **Navi** — your personal election companion for Indian elections.", "I'll guide you through eligibility, Voter ID registration, electoral roll verification, research, and casting your vote on the EVM.", "Let's start — where are you in your voting journey?"],
-          hi: ["नमस्ते! मैं **नवी** हूँ — भारतीय चुनावों के लिए आपकी व्यक्तिगत चुनाव साथी।", "मैं आपको पात्रता, मतदाता पहचान पत्र पंजीकरण, मतदाता सूची सत्यापन, शोध और EVM पर मतदान की पूरी प्रक्रिया में मार्गदर्शन करूंगी।", "चलिए शुरू करते हैं — आप मतदान यात्रा में कहाँ हैं?"],
-          kn: ["ನಮಸ್ಕಾರ! ನಾನು **ನವಿ** — ಭಾರತೀಯ ಚುನಾವಣೆಗಳಿಗಾಗಿ ನಿಮ್ಮ ವೈಯಕ್ತಿಕ ಚುನಾವಣಾ ಸಂಗಾತಿ.", "ನಾನು ಅರ್ಹತೆ, ಮತದಾರ ಗುರುತಿನ ಚೀಟಿ ನೋಂದಣಿ, ಮತದಾರ ಪಟ್ಟಿ ಪರಿಶೀಲನೆ, ಸಂಶೋಧನೆ ಮತ್ತು EVM ನಲ್ಲಿ ಮತ ಹಾಕುವ ಸಂಪೂರ್ಣ ಪ್ರಕ್ರಿಯೆಯಲ್ಲಿ ನಿಮಗೆ ಮಾರ್ಗದರ್ಶನ ನೀಡುತ್ತೇನೆ.", "ಪ್ರಾರಂಭಿಸೋಣ — ನೀವು ಮತದಾನ ಪ್ರಯಾಣದಲ್ಲಿ ಎಲ್ಲಿದ್ದೀರಿ?"],
-          ta: ["வணக்கம்! நான் **நவி** — இந்திய தேர்தல்களுக்கான உங்கள் தனிப்பட்ட தேர்தல் துணை.", "தகுதி, வாக்காளர் அடையாள அட்டை பதிவு, வாக்காளர் பட்டியல் சரிபார்ப்பு, ஆராய்ச்சி மற்றும் EVM-ல் வாக்களிப்பு ஆகிய அனைத்திலும் உங்களுக்கு வழிகாட்டுவேன்.", "தொடங்குவோம் — உங்கள் வாக்குரிமை பயணத்தில் எங்கே இருக்கிறீர்கள்?"],
-          te: ["నమస్తే! నేను **నవి** — భారతీయ ఎన్నికల కోసం మీ వ్యక్తిగత ఎన్నికల సహచరి.", "అర్హత, ఓటర్ ID నమోదు, ఓటరు జాబితా ధృవీకరణ, పరిశోధన మరియు EVM లో ఓటు వేయడం — అన్నింటిలో మీకు మార్గదర్శనం చేస్తాను.", "ప్రారంభిద్దాం — మీరు ఓటింగ్ ప్రయాణంలో ఎక్కడ ఉన్నారు?"],
-          ml: ["നമസ്തേ! ഞാൻ **നവി** — ഇന്ത്യൻ തെരഞ്ഞെടുപ്പുകൾക്കുള്ള നിങ്ങളുടെ വ്യക്തിഗത തെരഞ്ഞെടുപ്പ് സഹായി.", "യോഗ്യത, വോട്ടർ ID രജിസ്ട്രേഷൻ, വോട്ടർ പട്ടിക പരിശോധന, ഗവേഷണം, EVM-ൽ വോട്ട് ചെയ്യൽ എന്നിവയിൽ ഞാൻ നിങ്ങളെ സഹായിക്കും.", "തുടങ്ങാം — നിങ്ങളുടെ വോട്ടിംഗ് യാത്രയിൽ എവിടെയാണ് നിങ്ങൾ?"]
-        },
-        choices: {
-          en: [{ t: "🗳️ First-time voter", n: "first" }, { t: "🔄 Already have Voter ID", n: "returning" }, { t: "📦 Recently shifted residence", n: "moved" }, { t: "🌍 NRI / Overseas voter", n: "nri" }, { t: "👀 Just exploring", n: "explore" }],
-          hi: [{ t: "🗳️ पहली बार मतदाता", n: "first" }, { t: "🔄 पहले से वोटर ID है", n: "returning" }, { t: "📦 हाल ही में पता बदला है", n: "moved" }, { t: "🌍 NRI / विदेशी मतदाता", n: "nri" }, { t: "👀 बस देख रहा/रही हूँ", n: "explore" }],
-          kn: [{ t: "🗳️ ಮೊದಲ ಬಾರಿ ಮತದಾರ", n: "first" }, { t: "🔄 ಈಗಾಗಲೇ ವೋಟರ್ ID ಇದೆ", n: "returning" }, { t: "📦 ಇತ್ತೀಚೆಗೆ ವಿಳಾಸ ಬದಲಿಸಿದ್ದೇನೆ", n: "moved" }, { t: "🌍 NRI / ವಿದೇಶಿ ಮತದಾರ", n: "nri" }, { t: "👀 ಕೇವಲ ನೋಡುತ್ತಿದ್ದೇನೆ", n: "explore" }],
-          ta: [{ t: "🗳️ முதல் முறை வாக்காளர்", n: "first" }, { t: "🔄 ஏற்கனவே வாக்காளர் ID உள்ளது", n: "returning" }, { t: "📦 சமீபத்தில் முகவரி மாற்றினேன்", n: "moved" }, { t: "🌍 NRI / வெளிநாட்டு வாக்காளர்", n: "nri" }, { t: "👀 பார்வையிடுகிறேன்", n: "explore" }],
-          te: [{ t: "🗳️ మొదటిసారి ఓటరు", n: "first" }, { t: "🔄 ఇప్పటికే ఓటర్ ID ఉంది", n: "returning" }, { t: "📦 ఇటీవల చిరునామా మార్చాను", n: "moved" }, { t: "🌍 NRI / విదేశీ ఓటరు", n: "nri" }, { t: "👀 చూస్తున్నాను", n: "explore" }],
-          ml: [{ t: "🗳️ ആദ്യമായി വോട്ടർ", n: "first" }, { t: "🔄 ഇതിനകം വോട്ടർ ID ഉണ്ട്", n: "returning" }, { t: "📦 അടുത്തിടെ വിലാസം മാറ്റി", n: "moved" }, { t: "🌍 NRI / വിദേശ വോട്ടർ", n: "nri" }, { t: "👀 കാണുക മാത്രം", n: "explore" }]
-        }
-      },
+/* ============================================================
+   SECTION 12: QUERY PROCESSING (3-Tier Resolution)
+   ============================================================ */
 
-      first: {
-        step: 0, msgs: {
-          en: ["Welcome to the world's largest democracy! Let's confirm you're eligible.", "✅ Citizen of India\n✅ At least 18 years old as on 1st January of the year\n✅ Ordinarily resident of the constituency\n✅ Not disqualified by law", "Do these apply to you?"],
-          hi: ["दुनिया के सबसे बड़े लोकतंत्र में आपका स्वागत है! आइए पुष्टि करें।", "✅ भारत के नागरिक\n✅ उस वर्ष की 1 जनवरी को कम से कम 18 वर्ष\n✅ निर्वाचन क्षेत्र के सामान्य निवासी\n✅ कानून द्वारा अयोग्य नहीं", "क्या ये आप पर लागू होते हैं?"],
-          kn: ["ವಿಶ್ವದ ಅತಿದೊಡ್ಡ ಪ್ರಜಾಪ್ರಭುತ್ವಕ್ಕೆ ಸ್ವಾಗತ! ನೀವು ಅರ್ಹರೆಂದು ದೃಢೀಕರಿಸೋಣ.", "✅ ಭಾರತದ ಪ್ರಜೆ\n✅ ಆ ವರ್ಷದ ಜನವರಿ 1 ರಂದು ಕನಿಷ್ಠ 18 ವರ್ಷ\n✅ ಕ್ಷೇತ್ರದ ಸಾಮಾನ್ಯ ನಿವಾಸಿ\n✅ ಕಾನೂನಿನಿಂದ ಅನರ್ಹಗೊಂಡಿಲ್ಲ", "ಇವು ನಿಮಗೆ ಅನ್ವಯಿಸುತ್ತವೆಯೇ?"],
-          ta: ["உலகின் மிகப்பெரிய ஜனநாயகத்திற்கு வரவேற்கிறோம்! நீங்கள் தகுதியானவர் என உறுதிப்படுத்துவோம்.", "✅ இந்திய குடிமகன்\n✅ அந்த ஆண்டு ஜனவரி 1 அன்று குறைந்தது 18 வயது\n✅ தொகுதியின் நிரந்தர குடியிருப்பாளர்\n✅ சட்டத்தால் தகுதி நீக்கம் செய்யப்படவில்லை", "இவை உங்களுக்குப் பொருந்துமா?"],
-          te: ["ప్రపంచంలోని అతిపెద్ద ప్రజాస్వామ్యానికి స్వాగతం! మీరు అర్హులో లేదో నిర్ధారిద్దాం.", "✅ భారత పౌరుడు\n✅ ఆ సంవత్సరం జనవరి 1 నాటికి కనీసం 18 సంవత్సరాలు\n✅ నియోజకవర్గ సాధారణ నివాసి\n✅ చట్టం ద్వారా అనర్హుడు కాదు", "ఇవి మీకు వర్తిస్తాయా?"],
-          ml: ["ലോകത്തിലെ ഏറ്റവും വലിയ ജനാധിപത്യത്തിലേക്ക് സ്വാഗതം! നിങ്ങൾ യോഗ്യനാണോ എന്ന് ഉറപ്പാക്കാം.", "✅ ഇന്ത്യൻ പൗരൻ\n✅ ആ വർഷം ജനുവരി 1 ന് കുറഞ്ഞത് 18 വയസ്സ്\n✅ മണ്ഡലത്തിലെ സാധാരണ നിവാസി\n✅ നിയമപ്രകാരം അയോഗ്യനല്ല", "ഇവ നിങ്ങൾക്ക് ബാധകമാണോ?"]
-        },
-        choices: { en: [{ t: "✅ Yes, I'm eligible", n: "register" }, { t: "🤔 Not sure about one requirement", n: "elig_detail" }, { t: "❌ Might have a barrier", n: "elig_help" }], hi: [{ t: "✅ हाँ, मैं पात्र हूँ", n: "register" }, { t: "🤔 एक शर्त के बारे में अनिश्चित हूँ", n: "elig_detail" }, { t: "❌ कोई बाधा हो सकती है", n: "elig_help" }], kn: [{ t: "✅ ಹೌದು, ನಾನು ಅರ್ಹ", n: "register" }, { t: "🤔 ಒಂದು ಷರತ್ತಿನ ಬಗ್ಗೆ ಖಚಿತವಿಲ್ಲ", n: "elig_detail" }, { t: "❌ ಅಡೆತಡೆ ಇರಬಹುದು", n: "elig_help" }], ta: [{ t: "✅ ஆம், நான் தகுதியானவன்", n: "register" }, { t: "🤔 ஒரு நிபந்தனை பற்றி உறுதியில்லை", n: "elig_detail" }, { t: "❌ தடை இருக்கலாம்", n: "elig_help" }], te: [{ t: "✅ అవును, నేను అర్హుడిని", n: "register" }, { t: "🤔 ఒక షరతు గురించి ఖచ్చితంగా తెలియదు", n: "elig_detail" }, { t: "❌ అడ్డంకి ఉండవచ్చు", n: "elig_help" }], ml: [{ t: "✅ അതെ, ഞാൻ യോഗ്യനാണ്", n: "register" }, { t: "🤔 ഒരു വ്യവസ്ഥയെക്കുറിച്ച് ഉറപ്പില്ല", n: "elig_detail" }, { t: "❌ തടസ്സം ഉണ്ടാകാം", n: "elig_help" }] }
-      },
+/**
+ * Process user query through three resolution tiers:
+ * 1. Local keyword matching (instant, no API)
+ * 2. Google Gemini AI (intelligent, requires API key)
+ * 3. Static fallback (always available)
+ * 
+ * @param {string} raw - Raw user input text
+ */
+async function handleQuery(raw) {
+  const query = raw.toLowerCase().trim();
+  
+  // Input sanitization — prevent XSS
+  const sanitized = query.replace(/[<>]/g, '');
+  if (sanitized.length === 0) return;
+  
+  // TIER 1: Local keyword matching (instant)
+  const langMap = QMAP[curLang] || {};
+  const enMap = QMAP.en || {};
+  
+  for (const [keyword, nodeId] of Object.entries(langMap)) {
+    if (sanitized.includes(keyword)) { navigateToNode(nodeId, raw); return; }
+  }
+  for (const [keyword, nodeId] of Object.entries(enMap)) {
+    if (sanitized.includes(keyword)) { navigateToNode(nodeId, raw); return; }
+  }
+  
+  // TIER 2: Google Gemini AI (if available)
+  const aiResponse = await queryGemini(raw, curLang);
+  if (aiResponse) { addAIResponse(raw, aiResponse); return; }
+  
+  // TIER 3: Static fallback
+  addFallbackResponse(raw);
+}
 
-      elig_detail: {
-        step: 0, msgs: {
-          en: ["Let me break each requirement down:", "**Citizenship:** Must be a citizen of India. NRIs can also register.\n\n**Age:** 18 years as on 1st January of the year. Can apply in advance if turning 18 before final roll publication.\n\n**Residency:** Must ordinarily reside in the constituency. Can register in only ONE constituency.\n\n**Disqualifications:** Persons of unsound mind or convicted of certain offences may be disqualified."],
-          hi: ["हर शर्त को विस्तार से समझें:", "**नागरिकता:** भारत का नागरिक होना चाहिए। NRI भी पंजीकरण करा सकते हैं।\n\n**आयु:** उस वर्ष की 1 जनवरी को 18 वर्ष। अंतिम सूची प्रकाशन से पहले 18 होने पर पहले से आवेदन कर सकते हैं।\n\n**निवास:** निर्वाचन क्षेत्र में सामान्य रूप से निवासी होना चाहिए। केवल एक क्षेत्र में पंजीकरण।"]
-        },
-        card: { type: 'search', title: "Check Eligibility on ECI Portal", desc: "Visit the Election Commission of India's official portal", url: 'https://www.google.com/search?q=ECI+voter+eligibility+requirements+voters.eci.gov.in', icon: '🏛️' },
-        choices: { en: [{ t: "✅ I'm eligible — let's register!", n: "register" }, { t: "🔍 I'll check the ECI portal first", n: "eci_portal" }], hi: [{ t: "✅ मैं पात्र हूँ — पंजीकरण करें!", n: "register" }, { t: "🔍 पहले ECI पोर्टल देखूंगा", n: "eci_portal" }] }
-      },
+/**
+ * Navigate to a conversation node from user query
+ * @param {string} nodeId - Target node key
+ * @param {string} raw - Original user input for display
+ */
+function navigateToNode(nodeId, raw) {
+  addUserMessage(raw);
+  DOM.choices.innerHTML = '';
+  setTimeout(() => showNode(nodeId), 300);
+}
 
-      elig_help: {
-        step: 0, msgs: {
-          en: ["Many people who think they can't vote actually can. Indian election law is quite inclusive. Even NRIs can register.", "I'd recommend checking the specific rules on the ECI portal or contacting the Voter Helpline."],
-          hi: ["बहुत से लोग जो सोचते हैं कि वे वोट नहीं कर सकते, वास्तव में कर सकते हैं। भारतीय चुनाव कानून काफी समावेशी है। NRI भी पंजीकरण करा सकते हैं।"]
-        },
-        card: { type: 'play', title: "Download Voter Helpline App", desc: "Official ECI app — check eligibility, register, track status", url: 'https://play.google.com/store/search?q=voter+helpline+ECI&c=apps', icon: '📱' },
-        choices: { en: [{ t: "✅ Turns out I'm eligible!", n: "register" }, { t: "❌ Not eligible right now", n: "not_elig" }], hi: [{ t: "✅ मैं पात्र हूँ!", n: "register" }, { t: "❌ अभी पात्र नहीं हूँ", n: "not_elig" }] }
-      },
+/**
+ * Add user message bubble to chat
+ * @param {string} text - User's message text
+ */
+function addUserMessage(text) {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'msg user';
+  wrapper.setAttribute('role', 'article');
+  wrapper.innerHTML = '<div class="msg-av" aria-hidden="true">You</div><div class="bub"></div>';
+  wrapper.querySelector('.bub').textContent = text;
+  DOM.chat.appendChild(wrapper);
+  scrollChat();
+}
 
-      not_elig: {
-        step: 0, msgs: {
-          en: ["Thank you for checking. Even without voting, you can strengthen democracy:", "• Help others register to vote\n• Volunteer with voter awareness drives\n• Report violations using the cVIGIL app\n• Stay informed for future elections"],
-          hi: ["जांच के लिए धन्यवाद। बिना वोट के भी आप लोकतंत्र मजबूत कर सकते हैं:", "• दूसरों को पंजीकरण में मदद करें\n• मतदाता जागरूकता अभियान में स्वयंसेवक बनें\n• cVIGIL ऐप से उल्लंघन रिपोर्ट करें"]
-        },
-        choices: { en: [{ t: "🔄 Start over", n: "welcome" }], hi: [{ t: "🔄 शुरू से", n: "welcome" }] }
-      },
+/**
+ * Display Gemini AI response with verification disclaimer
+ * @param {string} raw - Original user query
+ * @param {string} response - AI-generated response
+ */
+async function addAIResponse(raw, response) {
+  addUserMessage(raw);
+  DOM.choices.innerHTML = '';
+  await addMsg(response + '\n\n_AI-generated — verify with ECI at eci.gov.in_');
+  addChoices(getCh(C.welcome));
+  addQuickActions();
+}
 
-      eci_portal: {
-        step: 1, msgs: {
-          en: ["The **ECI Voter Portal** (voters.eci.gov.in) is your one-stop destination:", "✅ Register as a new voter (Form 6)\n✅ Update/correct details (Form 8)\n✅ Migrate to a new constituency (Form 8A)\n✅ Link Aadhaar with Voter ID (Form 6B)\n✅ Check your name in the electoral roll\n✅ Track application status", "The portal integrates with **Google Maps** for location-based booth search."],
-          hi: ["**ECI मतदाता पोर्टल** (voters.eci.gov.in) आपका वन-स्टॉप गंतव्य है:", "✅ नया मतदाता पंजीकरण (फॉर्म 6)\n✅ विवरण अपडेट/सुधार (फॉर्म 8)\n✅ नए क्षेत्र में स्थानांतरण (फॉर्म 8A)\n✅ आधार लिंक (फॉर्म 6B)\n✅ मतदाता सूची में नाम जांच\n✅ आवेदन स्थिति ट्रैक", "पोर्टल में **Google Maps** एकीकृत है।"]
-        },
-        card: { type: 'search', title: "Visit ECI Voter Portal", desc: "voters.eci.gov.in — all voter services online", url: 'https://www.google.com/search?q=voters.eci.gov.in+voter+portal+India', icon: '🏛️' },
-        choices: { en: [{ t: "✅ Found what I need!", n: "verify" }, { t: "➡️ Continue guide", n: "verify" }], hi: [{ t: "✅ मिल गया!", n: "verify" }, { t: "➡️ गाइड जारी रखें", n: "verify" }] }
-      },
+/**
+ * Show static fallback response when no match found
+ * @param {string} raw - Original user query
+ */
+async function addFallbackResponse(raw) {
+  addUserMessage(raw);
+  DOM.choices.innerHTML = '';
+  
+  const fallbacks = {
+    en: "Try asking about: registration, voter ID, electoral roll, polling booth, documents, EVM, NOTA, NRI voting, Aadhaar, or election dates.\n\n💡 Enable AI mode (✦ button) for intelligent answers.",
+    hi: "पंजीकरण, वोटर ID, मतदाता सूची, बूथ, दस्तावेज, EVM, NOTA, NRI, आधार, चुनाव तारीख के बारे में पूछें।\n\n💡 AI मोड (✦ बटन) सक्षम करें।"
+  };
+  
+  await addMsg(fallbacks[curLang] || fallbacks.en);
+  addChoices(getCh(C.welcome));
+  addQuickActions();
+}
 
-      register: {
-        step: 1, msgs: {
-          en: ["Let's get you registered! Apply online via the **ECI Voter Portal** using **Form 6**.", "You'll need:\n📸 Passport-size photograph\n📄 Age proof (birth certificate, Class 10 marksheet)\n🏠 Address proof (Aadhaar, utility bill, bank passbook)\n\nAlternatively, use the **Voter Helpline App** — register, track, search all in one place."],
-          hi: ["आइए आपको पंजीकृत करें! **ECI मतदाता पोर्टल** पर **फॉर्म 6** से ऑनलाइन आवेदन करें।", "आपको चाहिए:\n📸 पासपोर्ट आकार का फोटो\n📄 आयु प्रमाण\n🏠 पता प्रमाण\n\n**वोटर हेल्पलाइन ऐप** से भी कर सकते हैं।"]
-        },
-        card: { type: 'play', title: "Voter Helpline App — Official ECI", desc: "Register, track status, search electoral roll, find BLO", url: 'https://play.google.com/store/search?q=voter+helpline+ECI&c=apps', icon: '📱' },
-        choices: { en: [{ t: "✅ I've applied!", n: "epic" }, { t: "📋 What documents?", n: "docs" }, { t: "❓ What is a BLO?", n: "blo" }, { t: "🔗 Link Aadhaar?", n: "aadhaar" }], hi: [{ t: "✅ आवेदन कर दिया!", n: "epic" }, { t: "📋 कौन से दस्तावेज?", n: "docs" }, { t: "❓ BLO क्या है?", n: "blo" }, { t: "🔗 आधार लिंक?", n: "aadhaar" }] }
-      },
+/* ============================================================
+   SECTION 13: VOICE SYSTEM (Web Speech API)
+   ============================================================ */
 
-      docs: {
-        step: 1, msgs: {
-          en: ["For **Form 6** (new voter registration):", "**Identity Proof:** Aadhaar Card, Passport, Driving Licence, PAN Card\n\n**Address Proof:** Aadhaar Card, Utility Bill, Bank Passbook, Ration Card\n\n**Age Proof:** Birth Certificate, Class 10 Marksheet, Passport\n\n💡 **Tip:** Aadhaar works as both identity and address proof."],
-          hi: ["**फॉर्म 6** (नया पंजीकरण) के लिए:", "**पहचान प्रमाण:** आधार, पासपोर्ट, DL, PAN\n\n**पता प्रमाण:** आधार, यूटिलिटी बिल, बैंक पासबुक\n\n**आयु प्रमाण:** जन्म प्रमाणपत्र, 10वीं मार्कशीट\n\n💡 **सुझाव:** आधार पहचान और पता दोनों के लिए काम करता है।"]
-        },
-        choices: { en: [{ t: "✅ I have these!", n: "epic" }, { t: "➡️ Continue", n: "epic" }], hi: [{ t: "✅ ये हैं मेरे पास!", n: "epic" }, { t: "➡️ आगे बढ़ें", n: "epic" }] }
-      },
+/**
+ * Speak text using SpeechSynthesis API
+ * @param {string} text - Text to speak aloud
+ */
+function speakText(text) {
+  if (!state.synth) return;
+  state.synth.cancel();
+  
+  const clean = text.replace(/\*\*/g, '').replace(/\_/g, '').replace(/\n/g, '. ');
+  const utterance = new SpeechSynthesisUtterance(clean);
+  utterance.lang = LANGS.find(l => l.code === curLang)?.voice || 'en-IN';
+  utterance.rate = 0.92;
+  utterance.pitch = 1;
+  
+  try {
+    const voices = state.synth.getVoices();
+    const match = voices.find(v => v.lang.startsWith(curLang));
+    if (match) utterance.voice = match;
+  } catch (e) { /* Use default voice */ }
+  
+  state.synth.speak(utterance);
+}
 
-      blo: {
-        step: 1, msgs: {
-          en: ["A **BLO (Booth Level Officer)** is a government official assigned to your polling booth area.", "They help with:\n• Voter registration\n• Distributing voter slips\n• Updating electoral roll\n• Answering election queries\n\nFind your BLO on the **Voter Helpline App** or ECI portal."],
-          hi: ["**BLO (बूथ लेवल अधिकारी)** आपके मतदान केंद्र क्षेत्र के सरकारी अधिकारी हैं।", "वे मदद करते हैं:\n• मतदाता पंजीकरण\n• मतदाता पर्ची वितरण\n• मतदाता सूची अपडेट\n• चुनाव प्रश्नों के उत्तर"]
-        },
-        card: { type: 'search', title: "Find Your BLO", desc: "Search for your Booth Level Officer", url: 'https://www.google.com/search?q=find+BLO+booth+level+officer+ECI+voters.eci.gov.in', icon: '👤' },
-        choices: { en: [{ t: "✅ Found my BLO!", n: "epic" }, { t: "➡️ Continue", n: "epic" }], hi: [{ t: "✅ BLO मिल गया!", n: "epic" }, { t: "➡️ आगे बढ़ें", n: "epic" }] }
-      },
+/** Initialize Speech Recognition with error handling */
+function initSpeechRecognition() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    DOM.voiceBtn.style.display = 'none';
+    return;
+  }
+  
+  state.recognition = new SpeechRecognition();
+  state.recognition.continuous = false;
+  state.recognition.interimResults = true;
+  state.recognition.lang = LANGS.find(l => l.code === curLang)?.voice || 'en-IN';
+  
+  state.recognition.onresult = (event) => {
+    const transcript = Array.from(event.results).map(r => r[0].transcript).join('');
+    DOM.userInp.value = transcript;
+    if (event.results[0].isFinal) { stopRecording(); handleQuery(transcript); }
+  };
+  
+  state.recognition.onerror = (e) => { console.warn('Speech error:', e.error); stopRecording(); };
+  state.recognition.onend = () => { if (state.isRecording) stopRecording(); };
+}
 
-      aadhaar: {
-        step: 2, msgs: {
-          en: ["Aadhaar linking is done via **Form 6B** on the ECI Voter Portal.", "**Benefits:**\n• Eliminates duplicate entries\n• Strengthens electoral roll integrity\n• Simplifies future updates\n\n⚠️ **Important:** Aadhaar linking is voluntary. Voting rights are NOT affected if you don't link."],
-          hi: ["आधार लिंकिंग ECI पोर्टल पर **फॉर्म 6B** से की जाती है।", "**फायदे:**\n• डुप्लीकेट प्रविष्टियाँ हटती हैं\n• मतदाता सूची की विश्वसनीयता बढ़ती है\n• भविष्य के अपडेट आसान\n\n⚠️ **महत्वपूर्ण:** आधार लिंकिंग स्वैच्छिक है।"]
-        },
-        card: { type: 'search', title: "Form 6B — Aadhaar Link", desc: "Link Aadhaar with Voter ID", url: 'https://www.google.com/search?q=Form+6B+Aadhaar+link+voter+ID+ECI+voters.eci.gov.in', icon: '🔗' },
-        choices: { en: [{ t: "✅ Done!", n: "verify" }, { t: "➡️ Skip for now", n: "verify" }], hi: [{ t: "✅ हो गया!", n: "verify" }, { t: "➡️ अभी छोड़ें", n: "verify" }] }
-      },
+/** Start voice recording */
+function startRecording() {
+  if (!state.recognition) return;
+  state.recognition.lang = LANGS.find(l => l.code === curLang)?.voice || 'en-IN';
+  try {
+    state.recognition.start();
+    state.isRecording = true;
+    DOM.voiceBtn.classList.add('recording');
+    DOM.vWave.classList.add('active');
+  } catch (e) { console.warn('STT start error:', e.message); }
+}
 
-      epic: {
-        step: 2, msgs: {
-          en: ["After verification, you'll receive your **EPIC (Electors Photo Identity Card)** — the Voter ID card.", "Processing takes 2-4 weeks. Track status on the **Voter Helpline App**."],
-          hi: ["सत्यापन के बाद, आपको **EPIC (मतदाता फोटो पहचान पत्र)** मिलेगा।", "प्रसंस्करण में 2-4 सप्ताह। **वोटर हेल्पलाइन ऐप** पर स्थिति ट्रैक करें।"]
-        },
-        card: { type: 'search', title: "Track EPIC / Voter ID Status", desc: "Check application status online", url: 'https://www.google.com/search?q=track+voter+ID+EPIC+status+India+eci.gov.in', icon: '🔍' },
-        choices: { en: [{ t: "✅ Got my Voter ID!", n: "verify" }, { t: "⏳ Still waiting", n: "verify" }, { t: "📋 Check electoral roll", n: "verify" }], hi: [{ t: "✅ वोटर ID मिल गया!", n: "verify" }, { t: "⏳ इंतज़ार है", n: "verify" }, { t: "📋 मतदाता सूची जांचें", n: "verify" }] }
-      },
+/** Stop voice recording */
+function stopRecording() {
+  if (!state.recognition) return;
+  try { state.recognition.stop(); } catch (e) { /* Already stopped */ }
+  state.isRecording = false;
+  DOM.voiceBtn.classList.remove('recording');
+  DOM.vWave.classList.remove('active');
+}
 
-      verify: {
-        step: 2, msgs: {
-          en: ["This is crucial — **always verify your name in the electoral roll** before every election.", "Check:\n✅ Name spelled correctly\n✅ Photograph is correct\n✅ Constituency & polling booth\n✅ Father's/Mother's name\n✅ Age and gender", "The ECI Voter Portal integrates **Google Maps** for location-based booth search."],
-          hi: ["यह बहुत महत्वपूर्ण है — हर चुनाव से पहले **मतदाता सूची में नाम जरूर जांचें**।", "जांचें:\n✅ नाम सही वर्तनी में\n✅ फोटो सही\n✅ निर्वाचन क्षेत्र और मतदान केंद्र\n✅ पिता/माता का नाम\n✅ आयु और लिंग"]
-        },
-        card: { type: 'search', title: "Check Electoral Roll", desc: "Search on voters.eci.gov.in", url: 'https://www.google.com/search?q=check+name+electoral+roll+voter+list+ECI+voters.eci.gov.in', icon: '📋' },
-        choices: { en: [{ t: "✅ Details are correct!", n: "research" }, { t: "⚠️ Needs correction", n: "corrections" }, { t: "❌ Name not in list", n: "name_missing" }], hi: [{ t: "✅ विवरण सही हैं!", n: "research" }, { t: "⚠️ सुधार चाहिए", n: "corrections" }, { t: "❌ नाम सूची में नहीं", n: "name_missing" }] }
-      },
+/* ============================================================
+   SECTION 14: EVENT HANDLERS
+   ============================================================ */
 
-      corrections: {
-        step: 2, msgs: {
-          en: ["For corrections, use **Form 8** on the ECI Voter Portal.", "Correct: name, age, address, photograph, gender, parent's name.", "Processing: 2-3 weeks."],
-          hi: ["सुधार के लिए **फॉर्म 8** का उपयोग करें।", "सुधार: नाम, आयु, पता, फोटो, लिंग, माता-पिता का नाम।"]
-        },
-        card: { type: 'search', title: "Form 8 — Corrections", desc: "File corrections on ECI Voter Portal", url: 'https://www.google.com/search?q=ECI+Form+8+correction+voter+ID+voters.eci.gov.in', icon: '✏️' },
-        choices: { en: [{ t: "✅ Corrections applied!", n: "research" }, { t: "➡️ Continue", n: "research" }], hi: [{ t: "✅ सुधार कर दिया!", n: "research" }, { t: "➡️ आगे बढ़ें", n: "research" }] }
-      },
-
-      name_missing: {
-        step: 2, msgs: {
-          en: ["Don't panic. Try:\n1. Search by **EPIC number** instead of name\n2. Recent registration? New entries take time\n3. Name may have been removed during roll revision\n4. Re-apply with fresh **Form 6**\n\nCall **Voter Helpline: 1950** for help."],
-          hi: ["घबराइए मत:\n1. **EPIC नंबर** से खोजें\n2. हाल ही में पंजीकरण? समय लगता है\n3. सूची संशोधन में नाम हटा हो सकता है\n4. नया **फॉर्म 6** जमा करें\n\n**वोटर हेल्पलाइन: 1950** पर कॉल करें।"]
-        },
-        card: { type: 'tel', title: "Call Voter Helpline: 1950", desc: "Toll-free ECI helpline", url: 'tel:1950', icon: '📞' },
-        choices: { en: [{ t: "📞 Call 1950", n: "research" }, { t: "📝 Re-apply", n: "register" }], hi: [{ t: "📞 1950 पर कॉल करें", n: "research" }, { t: "📝 दोबारा आवेदन", n: "register" }] }
-      },
-
-      research: {
-        step: 3, msgs: {
-          en: ["Now the most empowering part — making an informed choice!", "Research:\n👤 **Candidates** — Background, education, criminal record, assets\n📜 **Party Manifestos** — What they promise\n📊 **Incumbent's Performance** — What was delivered\n📰 **ADR / MyNeta** — Candidate report cards\n\n💡 **Pro tip:** Check **MyNeta.info** for candidate records. Watch ECI videos on YouTube for process clarity."],
-          hi: ["अब सबसे महत्वपूर्ण हिस्सा — सूचित चुनाव!", "शोध:\n👤 **उम्मीदवार** — पृष्ठभूमि, शिक्षा, आपराधिक रिकॉर्ड\n📜 **घोषणापत्र** — क्या वादे हैं\n📊 **वर्तमान प्रतिनिधि का प्रदर्शन**\n📰 **ADR / MyNeta** — उम्मीदवार रिपोर्ट कार्ड\n\n💡 **सुझाव:** **MyNeta.info** पर उम्मीदवार रिकॉर्ड देखें।"]
-        },
-        card: { type: 'search', title: "Research Candidates — MyNeta", desc: "Check candidate records, assets & criminal cases", url: 'https://www.google.com/search?q=MyNeta+candidate+details+my+constituency+India', icon: '🔍' },
-        choices: { en: [{ t: "✅ Researched!", n: "nota" }, { t: "📺 ECI videos on YouTube", n: "yt_eci" }], hi: [{ t: "✅ शोध पूरा!", n: "nota" }, { t: "📺 YouTube पर ECI वीडियो", n: "yt_eci" }] }
-      },
-
-      yt_eci: {
-        step: 3, msgs: {
-          en: ["Watch official ECI voter awareness videos to understand the process visually:"],
-          hi: ["चुनाव प्रक्रिया को देखकर समझने के लिए ECI के आधिकारिक वीडियो देखें:"]
-        },
-        // YouTube embed — Google Service integration
-        ytEmbed: 'rjvKGXMP3I0',
-        choices: { en: [{ t: "✅ Ready for next step!", n: "nota" }], hi: [{ t: "✅ अगले चरण के लिए तैयार!", n: "nota" }] }
-      },
-
-      nota: {
-        step: 4, msgs: {
-          en: ["An important option: **NOTA — None of the Above**.", "If no candidate appeals, press the **NOTA button** on the EVM — it's the last button.", "⚠️ Currently, NOTA doesn't have legal weight — the candidate with most votes still wins. But it sends a message.", "Showing up and pressing NOTA is always better than not voting at all."],
-          hi: ["एक महत्वपूर्ण विकल्प: **NOTA — इनमें से कोई नहीं**।", "कोई उम्मीदवार पसंद नहीं है तो EVM पर **NOTA बटन** दबाएं — यह आखिरी बटन है।", "⚠️ NOTA का कानूनी प्रभाव नहीं है। लेकिन यह संदेश देता है।"]
-        },
-        choices: { en: [{ t: "🗳️ Tell me about EVM & VVPAT", n: "evm" }, { t: "✅ Ready to prepare!", n: "prepare" }], hi: [{ t: "🗳️ EVM और VVPAT बताएं", n: "evm" }, { t: "✅ तैयारी करें!", n: "prepare" }] }
-      },
-
-      evm: {
-        step: 4, msgs: {
-          en: ["The **EVM (Electronic Voting Machine)** has two units:\n🔵 **BU (Balloting Unit)** — In the compartment with candidate buttons\n🟡 **CU (Control Unit)** — Operated by the polling officer\n\n**VVPAT** displays your vote for 7 seconds so you can verify it was recorded correctly."],
-          hi: ["**EVM** में दो यूनिट हैं:\n🔵 **BU (बैलटिंग यूनिट)** — वोटिंग कम्पार्टमेंट में\n🟡 **CU (कंट्रोल यूनिट)** — मतदान अधिकारी द्वारा संचालित\n\n**VVPAT** 7 सेकंड के लिए वोट दिखाता है।"]
-        },
-        // YouTube embed for EVM demonstration
-        ytEmbed: 'LxVJjEb2w2k',
-        choices: { en: [{ t: "✅ Let's prepare for Election Day!", n: "prepare" }], hi: [{ t: "✅ चुनाव दिवस की तैयारी!", n: "prepare" }] }
-      },
-
-      prepare: {
-        step: 5, msgs: {
-          en: ["Election Day preparation:", "📍 **Polling Booth** — Find using Voter Helpline App\n📋 **Voter Slip** — BLO will deliver\n🪪 **ID Proof** — EPIC or approved photo ID\n⏰ **Timing** — 7 AM to 6 PM\n📱 **Phone** — Keep charged, switch off inside booth\n\nFind your polling booth on Google Maps:"],
-          hi: ["चुनाव दिवस तैयारी:", "📍 **मतदान केंद्र** — वोटर हेल्पलाइन ऐप से खोजें\n📋 **मतदाता पर्ची** — BLO देगा\n🪪 **पहचान प्रमाण** — EPIC या मान्य फोटो ID\n⏰ **समय** — सुबह 7 से शाम 6 बजे\n📱 **फोन** — चार्ज रखें, बूथ में बंद करें\n\nGoogle Maps पर मतदान केंद्र खोजें:"]
-        },
-        // Google Maps embed — Google Service integration
-        mapsEmbed: true,
-        choices: { en: [{ t: "✅ Found my booth!", n: "checklist" }, { t: "📅 Add Google Calendar reminder", n: "calendar" }, { t: "📱 About Voter Helpline App", n: "vh_app" }], hi: [{ t: "✅ बूथ मिल गया!", n: "checklist" }, { t: "📅 Google Calendar रिमाइंडर", n: "calendar" }, { t: "📱 वोटर हेल्पलाइन ऐप", n: "vh_app" }] }
-      },
-
-      vh_app: {
-        step: 5, msgs: {
-          en: ["The **Voter Helpline App** is ECI's official must-have:", "📱 Electoral search (#GoVerify)\n📱 Online forms — registration, shifting, correction\n📱 Complaint registration & tracking\n📱 FAQ on Voter, Elections, EVM\n📱 Find candidates — profile, income, assets\n📱 Find BLO, ERO, DEO, CEO contacts\n📱 Election schedule for your area"],
-          hi: ["**वोटर हेल्पलाइन ऐप** ECI का आधिकारिक जरूरी ऐप:", "📱 निर्वाचक खोज (#GoVerify)\n📱 ऑनलाइन फॉर्म\n📱 शिकायत पंजीकरण और ट्रैकिंग\n📱 FAQ\n📱 उम्मीदवार खोजें\n📱 BLO, ERO, DEO, CEO संपर्क\n📱 चुनाव कार्यक्रम"]
-        },
-        card: { type: 'play', title: "Download Voter Helpline App", desc: "Official ECI app — all voter services", url: 'https://play.google.com/store/search?q=voter+helpline+app+ECI&c=apps', icon: '📱' },
-        choices: { en: [{ t: "✅ Downloaded!", n: "checklist" }], hi: [{ t: "✅ डाउनलोड हो गया!", n: "checklist" }] }
-      },
-
-      calendar: {
-        step: 5, msgs: {
-          en: ["Add Election Day to your Google Calendar:"],
-          hi: ["Google Calendar में चुनाव दिवस जोड़ें:"]
-        },
-        // Google Calendar integration
-        card: { type: 'calendar', title: "Add to Google Calendar", desc: "Election Day reminder", url: 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=Indian+Election+Day+%F0%9F%97%B3%EF%B8%8F&dates=20260501T070000/20260501T180000&details=Vote!+Carry+Voter+ID+and+voter+slip.&location=Your+Polling+Booth', icon: '📅' },
-        choices: { en: [{ t: "✅ Reminder set!", n: "checklist" }], hi: [{ t: "✅ रिमाइंडर सेट!", n: "checklist" }] }
-      },
-
-      checklist: {
-        step: 6, msgs: {
-          en: ["Your complete Election Day checklist:", "✅ Electoral roll verified\n✅ Polling booth confirmed\n✅ Voter slip received\n✅ EPIC / photo ID ready\n✅ Research completed\n✅ Route planned\n✅ Phone charged\n\n**Know your rights:**\n⚖️ In line before polls close? You CAN still vote.\n⚖️ Right to secret ballot.\n⚖️ Use NOTA if no candidate appeals.\n⚖️ Report violations via **cVIGIL App**.\n⚖️ Call **1950** for any issues."],
-          hi: ["संपूर्ण चुनाव दिवस चेकलिस्ट:", "✅ मतदाता सूची सत्यापित\n✅ मतदान केंद्र पुष्ट\n✅ मतदाता पर्ची प्राप्त\n✅ EPIC / फोटो ID तैयार\n✅ शोध पूरा\n✅ रूट योजना\n✅ फोन चार्ज\n\n**अधिकार जानें:**\n⚖️ कतार में? अभी भी वोट कर सकते हैं।\n⚖️ गुप्त मतदान का अधिकार।\n⚖️ **cVIGIL** से उल्लंघन रिपोर्ट करें।\n⚖️ **1950** पर कॉल करें।"]
-        },
-        choices: { en: [{ t: "🎉 Ready to vote!", n: "complete" }, { t: "📱 What is cVIGIL?", n: "cvigil" }, { t: "📬 Postal ballot?", n: "postal" }], hi: [{ t: "🎉 मतदान के लिए तैयार!", n: "complete" }, { t: "📱 cVIGIL क्या है?", n: "cvigil" }, { t: "📬 पोस्टल बैलट?", n: "postal" }] }
-      },
-
-      cvigil: {
-        step: 6, msgs: {
-          en: ["**cVIGIL** (Citizens Vigil) lets you report Model Code of Conduct violations:", "🚨 Report: cash/gift distribution, unauthorized posters, loudspeaker violations, intimidation.\n\n📸 Take a photo/video — auto-geotags your location.\n⏱️ **ECI must respond within 100 minutes!**"],
-          hi: ["**cVIGIL** से आदर्श आचार संहिता उल्लंघन रिपोर्ट करें:", "🚨 रिपोर्ट: नकद/उपहार, अनधिकृत पोस्टर, लाउडस्पीकर, धमकी।\n\n📸 फोटो/वीडियो — स्वतः लोकेशन टैग।\n⏱️ **ECI को 100 मिनट में जवाब देना होगा!**"]
-        },
-        card: { type: 'play', title: "Download cVIGIL App", desc: "Report violations — ECI responds within 100 min", url: 'https://play.google.com/store/search?q=cVIGIL+ECI+app&c=apps', icon: '🚨' },
-        choices: { en: [{ t: "✅ Ready to vote!", n: "complete" }], hi: [{ t: "✅ मतदान के लिए तैयार!", n: "complete" }] }
-      },
-
-      postal: {
-        step: 6, msgs: {
-          en: ["Postal ballot for: service voters, 80+ aged, PwD voters (40%+ disability), essential workers.\n\nFor most voters, **in-person voting at the booth** is standard."],
-          hi: ["पोस्टल बैलट: सेवा मतदाता, 80+ आयु, दिव्यांग मतदाता।\n\nअधिकांश के लिए **बूथ पर व्यक्तिगत मतदान** मानक है।"]
-        },
-        choices: { en: [{ t: "🎉 Ready!", n: "complete" }], hi: [{ t: "🎉 तैयार!", n: "complete" }] }
-      },
-
-      returning: {
-        step: 0, msgs: {
-          en: ["Great to have a returning voter! Let's verify your registration is current.", "Has anything changed since you last voted?"],
-          hi: ["वापसी मतदाता का स्वागत है! सत्यापित करें।", "पिछली बार से कुछ बदला है?"]
-        },
-        choices: { en: [{ t: "📍 Same address", n: "verify" }, { t: "📦 Shifted residence", n: "moved" }, { t: "✏️ Need correction", n: "corrections" }, { t: "🤷 Not sure about status", n: "verify" }], hi: [{ t: "📍 वही पता", n: "verify" }, { t: "📦 पता बदला", n: "moved" }, { t: "✏️ सुधार चाहिए", n: "corrections" }, { t: "🤷 स्थिति अनिश्चित", n: "verify" }] }
-      },
-
-      moved: {
-        step: 1, msgs: {
-          en: ["If you've shifted, update registration using **Form 8A** on ECI Voter Portal.\n\nYou **cannot** vote at a booth other than your assigned one."],
-          hi: ["पता बदला है तो **फॉर्म 8A** से अपडेट करें।\n\nअपने निर्धारित बूथ के अलावा कहीं और वोट **नहीं** कर सकते।"]
-        },
-        card: { type: 'search', title: "Form 8A — Migration", desc: "Change constituency on ECI Portal", url: 'https://www.google.com/search?q=ECI+Form+8A+change+address+constituency+voters.eci.gov.in', icon: '📝' },
-        choices: { en: [{ t: "✅ Updated!", n: "verify" }, { t: "➡️ Continue", n: "verify" }], hi: [{ t: "✅ अपडेट हो गया!", n: "verify" }, { t: "➡️ आगे बढ़ें", n: "verify" }] }
-      },
-
-      nri: {
-        step: 0, msgs: {
-          en: ["As an **NRI**, you can register as an overseas voter!", "**Requirements:**\n✅ Indian citizen, absent due to employment/education\n✅ Not acquired citizenship of another country\n✅ Valid Indian passport\n\n**Process:**\n1. Fill **Form 6A** at voterportal.eci.gov.in\n2. Upload passport copies, photo, valid visa\n3. BLO verifies at your Indian address\n4. Vote **in person** with original passport"],
-          hi: ["**NRI** के रूप में, आप विदेशी मतदाता के रूप में पंजीकरण कर सकते हैं!", "**आवश्यकताएं:**\n✅ भारतीय नागरिक, रोजगार/शिक्षा के कारण अनुपस्थित\n✅ अन्य देश की नागरिकता नहीं\n✅ वैध भारतीय पासपोर्ट\n\n**प्रक्रिया:**\n1. voterportal.eci.gov.in पर **फॉर्म 6A** भरें\n2. पासपोर्ट कॉपी, फोटो, वीज़ा अपलोड करें\n3. BLO सत्यापन करेगा\n4. मूल पासपोर्ट दिखाकर वोट करें"]
-        },
-        card: { type: 'search', title: "NRI Voter Registration — Form 6A", desc: "Apply on voterportal.eci.gov.in", url: 'https://www.google.com/search?q=NRI+voter+registration+Form+6A+voterportal.eci.gov.in', icon: '🌍' },
-        choices: { en: [{ t: "✅ Applied as NRI!", n: "verify" }, { t: "📋 NRI documents", n: "nri_docs" }, { t: "➡️ Continue guide", n: "verify" }], hi: [{ t: "✅ NRI के रूप में आवेदन!", n: "verify" }, { t: "📋 NRI दस्तावेज", n: "nri_docs" }, { t: "➡️ गाइड जारी", n: "verify" }] }
-      },
-
-      nri_docs: {
-        step: 0, msgs: {
-          en: ["Documents for NRI voter registration (Form 6A):", "📸 Passport-size photograph\n📄 Self-attested passport pages (photo, Indian address, visa)\n📋 Valid visa endorsement page\n\n**Submit:** Online at voterportal.eci.gov.in OR at ERO/Indian Mission"],
-          hi: ["NRI पंजीकरण (फॉर्म 6A) के लिए दस्तावेज:", "📸 पासपोर्ट आकार फोटो\n📄 पासपोर्ट पेज की कॉपी\n📋 वैध वीज़ा पेज\n\n**जमा:** ऑनलाइन या ERO/भारतीय मिशन में"]
-        },
-        choices: { en: [{ t: "✅ Ready to apply!", n: "verify" }], hi: [{ t: "✅ आवेदन के लिए तैयार!", n: "verify" }] }
-      },
-
-      explore: {
-        step: 0, msgs: {
-          en: ["Here's how Indian elections work in 7 steps:", "**1. Eligibility** — Confirm you qualify\n**2. Registration** — Apply for Voter ID via ECI\n**3. Verification** — Check electoral roll\n**4. Research** — Study candidates & manifestos\n**5. Preparation** — Know your booth & documents\n**6. Election Day** — Cast your vote on EVM\n**7. After Voting** — Track results, stay engaged\n\nLok Sabha elections happen every 5 years across multiple phases."],
-          hi: ["भारतीय चुनाव 7 चरणों में:", "**1. पात्रता** — पुष्टि करें\n**2. पंजीकरण** — ECI से वोटर ID\n**3. सत्यापन** — मतदाता सूची जांचें\n**4. शोध** — उम्मीदवार और घोषणापत्र\n**5. तैयारी** — बूथ और दस्तावेज\n**6. चुनाव दिवस** — EVM पर वोट\n**7. मतदान के बाद** — परिणाम ट्रैक करें\n\nलोकसभा चुनाव हर 5 साल में कई चरणों में।"]
-        },
-        choices: { en: [{ t: "✅ Step by step", n: "first" }, { t: "📅 Key election dates", n: "key_dates" }], hi: [{ t: "✅ कदम दर कदम", n: "first" }, { t: "📅 मुख्य तारीखें", n: "key_dates" }] }
-      },
-
-      key_dates: {
-        step: 0, msgs: {
-          en: ["Key dates in the Indian election cycle:", "📅 **25 January** — National Voters' Day\n📅 **January** — Annual roll revision\n📅 **Ongoing** — Form 6 accepted year-round\n📅 **March-April** — ECI announces General Election schedule\n📅 **April-May** — Lok Sabha elections (multiple phases)\n📅 **October** — Special summary revision"],
-          hi: ["भारतीय चुनाव चक्र की प्रमुख तारीखें:", "📅 **25 जनवरी** — राष्ट्रीय मतदाता दिवस\n📅 **जनवरी** — वार्षिक संशोधन\n📅 **साल भर** — फॉर्म 6 स्वीकार\n📅 **मार्च-अप्रैल** — ECI चुनाव कार्यक्रम घोषणा\n📅 **अप्रैल-मई** — लोकसभा चुनाव\n📅 **अक्टूबर** — विशेष संशोधन"]
-        },
-        card: { type: 'search', title: "Upcoming Election Schedule", desc: "Check ECI for latest dates", url: 'https://www.google.com/search?q=ECI+election+schedule+upcoming+India+eci.gov.in', icon: '📅' },
-        choices: { en: [{ t: "📅 Add to Google Calendar", n: "calendar" }, { t: "➡️ Go through steps", n: "first" }], hi: [{ t: "📅 Google Calendar में जोड़ें", n: "calendar" }, { t: "➡️ चरणों से गुज़रें", n: "first" }] }
-      },
-
-      complete: {
-        step: 7, msgs: {
-          en: ["Congratulations! You've completed your election preparation journey.", "✅ Eligibility confirmed\n✅ Registration & Voter ID sorted\n✅ Electoral roll verified\n✅ Candidates researched\n✅ Polling booth & documents ready\n✅ Election Day process understood\n✅ Rights as a voter known", "India has over **97 crore registered voters** — the world's largest electorate. Every single vote shapes the nation's future.", "Your vote is your voice. Use it wisely. **Jai Hind!** 🇮🇳"],
-          hi: ["बधाई! चुनाव तैयारी यात्रा पूरी!", "✅ पात्रता पुष्ट\n✅ पंजीकरण और वोटर ID तैयार\n✅ मतदाता सूची सत्यापित\n✅ शोध पूरा\n✅ बूथ और दस्तावेज तैयार\n✅ प्रक्रिया समझी\n✅ अधिकार ज्ञात", "**97 करोड़+ पंजीकृत मतदाता** — विश्व का सबसे बड़ा मतदाता समूह।", "आपका वोट आपकी आवाज़। **जय हिंद!** 🇮🇳"]
-        },
-        card: {
-          type: 'links', title: "Quick Reference — Save These", links: [
-            { l: '🏛️ ECI Voter Portal', u: 'https://voters.eci.gov.in' },
-            { l: '📞 Voter Helpline: 1950', u: 'tel:1950' },
-            { l: '📱 Voter Helpline App', u: 'https://play.google.com/store/search?q=voter+helpline+ECI' },
-            { l: '🚨 cVIGIL App', u: 'https://play.google.com/store/search?q=cVIGIL+ECI' },
-            { l: '📍 Find Polling Booth', u: 'https://www.google.com/maps/search/polling+booth+near+me' },
-            { l: '🔍 Check Electoral Roll', u: 'https://www.google.com/search?q=check+name+electoral+roll+ECI' },
-            { l: '🔗 ECINet Portal', u: 'https://www.google.com/search?q=ECINet+eci.gov.in' }
-          ]
-        },
-        choices: { en: [{ t: "🔄 Start a new journey", n: "welcome" }], hi: [{ t: "🔄 नई यात्रा", n: "welcome" }] }, celebrate: true
-      }
-    };
-
-    /* ============================================================
-       SECTION 5: QUERY KEYWORD MATCHING ENGINE
-       ============================================================ */
-
-    const QMAP = {
-      en: { register: 'register', registration: 'register', 'voter id': 'epic', epic: 'epic', 'check name': 'verify', 'electoral roll': 'verify', 'voter list': 'verify', 'polling booth': 'prepare', booth: 'prepare', documents: 'docs', 'id proof': 'docs', aadhaar: 'aadhaar', 'aadhar link': 'aadhaar', nri: 'nri', overseas: 'nri', nota: 'nota', evm: 'evm', vvpat: 'evm', complaint: 'cvigil', cvigil: 'cvigil', 'election date': 'key_dates', schedule: 'key_dates', blo: 'blo', 'booth level': 'blo', helpline: 'helpline', 1950: 'helpline', postal: 'postal', research: 'research', candidate: 'research', manifesto: 'research', calendar: 'calendar', reminder: 'calendar', 'how to vote': 'prepare', 'voting process': 'prepare', 'voter slip': 'prepare' },
-      hi: { पंजीकरण: 'register', 'मतदाता पहचान': 'epic', 'वोटर id': 'epic', 'नाम जांच': 'verify', 'मतदाता सूची': 'verify', 'मतदान केंद्र': 'prepare', दस्तावेज: 'docs', आधार: 'aadhaar', 'आधार लिंक': 'aadhaar', nota: 'nota', evm: 'evm', शिकायत: 'cvigil', 'चुनाव तारीख': 'key_dates', बीएलओ: 'blo', हेल्पलाइन: 'helpline', 1950: 'helpline', पोस्टल: 'postal', शोध: 'research', उम्मीदवार: 'research', कैलेंडर: 'calendar' },
-      kn: { ನೋಂದಣಿ: 'register', 'ವೋಟರ್ id': 'epic', 'ಮತದಾರ ಪಟ್ಟಿ': 'verify', 'ಮತಗಟ್ಟೆ': 'prepare', ದಾಖಲೆ: 'docs', 'ಆಧಾರ್': 'aadhaar', nri: 'nri', nota: 'nota', evm: 'evm', 'ದೂರು': 'cvigil', 'ಚುನಾವಣಾ ದಿನಾಂಕ': 'key_dates', 'ಹೆಲ್ಪ್‌ಲೈನ್': 'helpline' },
-      ta: { பதிவு: 'register', 'வாக்காளர் பட்டியல்': 'verify', 'வாக்குச்சாவடி': 'prepare', ஆவணம்: 'docs', 'ஆதார்': 'aadhaar', nri: 'nri', nota: 'nota', evm: 'evm', 'புகார்': 'cvigil', 'தேர்தல் தேதி': 'key_dates', 'ஹெல்ப்லைன்': 'helpline' },
-      te: { నమోదు: 'register', 'ఓటరు జాబితా': 'verify', 'పోలింగ్ బూత్': 'prepare', పత్రాలు: 'docs', 'ఆధార్': 'aadhaar', nri: 'nri', nota: 'nota', evm: 'evm', 'ఫిర్యాదు': 'cvigil', 'ఎన్నికల తేదీ': 'key_dates', 'హెల్ప్‌లైన్': 'helpline' },
-      ml: { രജിസ്ട്രേഷൻ: 'register', 'വോട്ടർ പട്ടിക': 'verify', 'പോളിംഗ് ബൂത്ത്': 'prepare', 'രേഖകൾ': 'docs', 'ആധാർ': 'aadhaar', nri: 'nri', nota: 'nota', evm: 'evm', 'പരാതി': 'cvigil', 'തെരഞ്ഞെടുപ്പ് തീയതി': 'key_dates', 'ഹെൽപ്‌ലൈൻ': 'helpline' }
-    };
-
-    /* ============================================================
-       SECTION 6: DOM REFERENCES & STATE
-       ============================================================ */
-
-    const chatEl = document.getElementById('chat'), choicesEl = document.getElementById('choices');
-    const hOrb = document.getElementById('hOrb'), hSt = document.getElementById('hSt');
-    const hRF = document.getElementById('hRF'), hRT = document.getElementById('hRT');
-    const userInp = document.getElementById('userInp'), sendBtn = document.getElementById('sendBtn');
-    const voiceBtn = document.getElementById('voiceBtn'), voiceTog = document.getElementById('voiceTog');
-    const langBtn = document.getElementById('langBtn');
-
-    const STEPS = ['Eligible', 'Register', 'Verify', 'Research', 'Prepare', 'Vote Day', 'Done'];
-    const TOTAL = 7;
-    let curProg = 0, voiceOn = false, isRecording = false;
-    let recognition, synth = window.speechSynthesis;
-
-    /* ============================================================
-       SECTION 7: JOURNEY BAR SETUP
-       ============================================================ */
-
-    const jBar = document.getElementById('jBar');
-    STEPS.forEach((s, i) => {
-      if (i > 0) { const l = document.createElement('div'); l.className = 'j-line'; l.dataset.idx = i; jBar.appendChild(l) }
-      const d = document.createElement('div'); d.className = 'j-dot'; d.dataset.l = s; d.dataset.idx = i;
-      d.setAttribute('role', 'presentation'); jBar.appendChild(d);
-    });
-
-    /* ============================================================
-       SECTION 8: LANGUAGE SELECTOR
-       ============================================================ */
-
-    const lsGrid = document.getElementById('lsGrid');
-    LANGS.forEach(l => {
-      const d = document.createElement('div'); d.className = 'ls-card'; d.setAttribute('role', 'option');
-      d.setAttribute('tabindex', '0'); d.setAttribute('aria-label', l.latin + ' — ' + l.native);
-      d.innerHTML = `<span class="native" style="font-family:${l.font}">${l.native}</span><span class="latin">${l.latin}</span>`;
-      d.addEventListener('click', () => selectLang(l.code));
-      d.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectLang(l.code) } });
-      lsGrid.appendChild(d);
-    });
-
-    function selectLang(code) {
-      curLang = code;
-      document.documentElement.lang = code;
-      document.getElementById('langSel').classList.add('exit');
-      document.getElementById('chatScreen').classList.add('active');
-      userInp.placeholder = t('placeholder');
-      langBtn.textContent = t('changeLang');
-      updateQuickActions();
-      setTimeout(() => showNode('welcome'), 900);
+/** AI toggle button */
+DOM.aiTog.addEventListener('click', async () => {
+  if (GEMINI.ready) {
+    DOM.aiTog.classList.toggle('active');
+    DOM.aiTog.setAttribute('aria-pressed', DOM.aiTog.classList.contains('active'));
+    DOM.aiTog.title = DOM.aiTog.classList.contains('active') ? 'AI mode ON' : 'AI mode OFF';
+  } else {
+    const ok = await showApiKeyModal();
+    if (ok) {
+      DOM.aiTog.classList.add('active');
+      DOM.aiTog.setAttribute('aria-pressed', 'true');
+      DOM.aiTog.title = 'AI mode ON';
     }
+  }
+});
 
-    function updateQuickActions() {
-      document.querySelectorAll('.qa-btn').forEach((b, i) => {
-        const qa = t('qa'); if (qa[i]) b.textContent = qa[i];
-      });
-    }
+/** Voice input toggle */
+DOM.voiceBtn.addEventListener('click', () => {
+  state.isRecording ? stopRecording() : startRecording();
+});
 
-    /* ============================================================
-       SECTION 9: CHAT ENGINE
-       ============================================================ */
+/** Voice output toggle */
+DOM.voiceTog.addEventListener('click', () => {
+  state.voiceOn = !state.voiceOn;
+  DOM.voiceTog.classList.toggle('active', state.voiceOn);
+  DOM.voiceTog.textContent = state.voiceOn ? '🔊' : '🔇';
+  DOM.voiceTog.setAttribute('aria-pressed', state.voiceOn);
+  if (!state.voiceOn && state.synth) state.synth.cancel();
+});
 
-    /** @param {number} ms - Delay in milliseconds */
-    function sleep(ms) { return new Promise(r => setTimeout(r, ms)) }
+/** Language change */
+DOM.langBtn.addEventListener('click', () => {
+  DOM.chatScreen.classList.remove('active');
+  setTimeout(() => {
+    DOM.langSel.classList.remove('exit');
+    state.curProg = 0;
+    DOM.chat.innerHTML = '';
+    DOM.choices.innerHTML = '';
+    updateProgress(0);
+  }, 400);
+});
 
-    /** Scroll chat to bottom */
-    function scroll() { chatEl.scrollTop = chatEl.scrollHeight }
+/** Send message */
+DOM.sendBtn.addEventListener('click', () => {
+  const val = DOM.userInp.value.trim();
+  if (val) { DOM.userInp.value = ''; handleQuery(val); }
+});
 
-    /** Update status text in header */
-    function setSt(txt, on) { hSt.textContent = txt; hSt.classList.toggle('on', on) }
+/** Enter to send */
+DOM.userInp.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    const val = DOM.userInp.value.trim();
+    if (val) { DOM.userInp.value = ''; handleQuery(val); }
+  }
+});
 
-    /** Update journey progress ring and dots */
-    function updProg(step) {
-      if (step === undefined) return;
-      curProg = Math.max(curProg, step);
-      const p = Math.round((curProg / TOTAL) * 100);
-      hRT.textContent = p + '%';
-      hRF.style.strokeDashoffset = 94 - (94 * p / 100);
-      jBar.setAttribute('aria-valuenow', curProg);
-      document.querySelectorAll('.j-dot').forEach((d, i) => {
-        d.classList.toggle('active', i === curProg); d.classList.toggle('done', i < curProg);
-      });
-      document.querySelectorAll('.j-line').forEach((l, i) => { l.classList.toggle('done', i < curProg) });
-    }
+/** Form submission prevention */
+DOM.inputForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const val = DOM.userInp.value.trim();
+  if (val) { DOM.userInp.value = ''; handleQuery(val); }
+});
 
-    /** Show typing indicator */
-    async function showTyping() {
-      hOrb.classList.add('thinking'); setSt(t('think'), true);
-      const el = document.createElement('div'); el.className = 'typ'; el.setAttribute('aria-label', 'Navi is typing');
-      el.innerHTML = '<div class="msg-av" aria-hidden="true">✦</div><div class="typ-dots"><div class="typ-dot"></div><div class="typ-dot"></div><div class="typ-dot"></div></div>';
-      chatEl.appendChild(el); scroll();
-      await sleep(450 + Math.random() * 350); el.remove();
-    }
+/* ============================================================
+   SECTION 15: CELEBRATION & BOOTSTRAP
+   ============================================================ */
 
-    /** Type text character by character with markdown support */
-    async function typeText(container, text, speed = 14) {
-      const html = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
-      let buf = '', i = 0;
-      hOrb.classList.add('thinking'); setSt(t('speak'), true);
-      while (i < html.length) {
-        if (html[i] === '<') { const e = html.indexOf('>', i); buf += html.substring(i, e + 1); i = e + 1 }
-        else { buf += html[i]; i++; container.innerHTML = buf; scroll(); await sleep(speed + Math.random() * 6) }
-      }
-      container.innerHTML = html;
-      hOrb.classList.remove('thinking'); setSt(t('ready'), false);
-      if (voiceOn) speakText(text);
-    }
+/** Show Indian tricolor confetti celebration */
+function celebrate() {
+  const container = DOM.cele;
+  container.classList.add('on');
+  
+  const colors = ['#ff9933', '#FFFFFF', '#138808', '#d4a84b', '#f0d878', '#5b8def'];
+  const frag = document.createDocumentFragment();
+  
+  for (let i = 0; i < 100; i++) {
+    const confetti = document.createElement('div');
+    confetti.className = 'conf';
+    confetti.setAttribute('aria-hidden', 'true');
+    confetti.style.cssText = `left:${Math.random()*100}%;background:${colors[i%6]};animation-delay:${Math.random()*2.5}s;animation-duration:${2.5+Math.random()*2.5}s;width:${4+Math.random()*7}px;height:${4+Math.random()*7}px;border-radius:${Math.random()>.5?'50%':'2px'}`;
+    frag.appendChild(confetti);
+  }
+  
+  container.appendChild(frag);
+  
+  const msg = document.createElement('div');
+  msg.className = 'cele-m';
+  msg.setAttribute('role', 'dialog');
+  msg.setAttribute('aria-label', 'Journey Complete');
+  
+  const content = {
+    en: '<h2>Jai Hind! 🇮🇳</h2><p>You\'re prepared for the world\'s largest democracy. Go vote!</p>',
+    hi: '<h2>जय हिंद! 🇮🇳</h2><p>आप विश्व के सबसे बड़े लोकतंत्र के लिए तैयार हैं। वोट करें!</p>'
+  };
+  
+  msg.innerHTML = (content[curLang] || content.en) +
+    '<button onclick="this.closest(\'.cele-m\').remove();document.getElementById(\'cele\').classList.remove(\'on\')" autofocus>OK</button>';
+  container.appendChild(msg);
+  
+  setTimeout(() => { container.classList.remove('on'); container.innerHTML = ''; }, 12000);
+}
 
-    /** Add agent message with typing animation */
-    async function addMsg(text) {
-      await showTyping();
-      const w = document.createElement('div'); w.className = 'msg agent'; w.setAttribute('role', 'article');
-      w.innerHTML = '<div class="msg-av" aria-hidden="true">✦</div><div class="bub"></div>';
-      chatEl.appendChild(w); scroll();
-      await typeText(w.querySelector('.bub'), text); await sleep(100);
-    }
-
-    /**
-     * Add Google service card (Search, Maps, Calendar, Play, YouTube, Phone, Links)
-     * @param {Object} c - Card configuration
-     */
-    function addCard(c) {
-      let el;
-      if (c.type === 'links') {
-        el = document.createElement('div'); el.className = 'rc-links'; el.setAttribute('role', 'navigation'); el.setAttribute('aria-label', 'Quick reference links');
-        el.innerHTML = `<div class="rc-links-head"><div class="rc-ico" aria-hidden="true">🔗</div><h4>${c.title}</h4></div>`;
-        c.links.forEach(link => {
-          const a = document.createElement('a'); a.className = 'rc-link'; a.href = link.u; a.target = '_blank';
-          a.rel = 'noopener noreferrer'; a.innerHTML = link.l + '<span aria-hidden="true">↗</span>';
-          el.appendChild(a);
-        });
-      } else {
-        const labels = { search: 'Google Search', maps: 'Google Maps', calendar: 'Google Calendar', play: 'Google Play Store', yt: 'YouTube', tel: 'Phone' };
-        el = document.createElement('a'); el.className = 'rc'; el.href = c.url; el.target = '_blank'; el.rel = 'noopener noreferrer';
-        el.setAttribute('aria-label', c.title + ' — Opens ' + labels[c.type]);
-        el.innerHTML = `<div class="rc-ico" aria-hidden="true">${c.icon || '🔗'}</div><div class="rc-body"><h4>${c.title}</h4><p>${c.desc}</p><span class="rc-tag">${labels[c.type] || 'Link'} ↗</span></div><div class="rc-arr" aria-hidden="true">→</div>`;
-      }
-      chatEl.appendChild(el); scroll();
-    }
-
-    /**
-     * Add embedded YouTube video (Google Service)
-     * @param {string} videoId - YouTube video ID
-     */
-    function addYouTubeEmbed(videoId) {
-      const el = document.createElement('div'); el.className = 'yt-embed'; el.setAttribute('aria-label', 'Embedded YouTube video');
-      el.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}" title="ECI Voter Awareness Video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowloading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>`;
-      chatEl.appendChild(el); scroll();
-    }
-
-    /**
-     * Add embedded Google Maps (Google Service)
-     */
-    function addMapsEmbed() {
-      const el = document.createElement('div'); el.className = 'maps-embed'; el.setAttribute('aria-label', 'Google Maps — Find polling booth');
-      el.innerHTML = `<iframe src="https://www.google.com/maps/embed?pb=!1m16!1m12!1m3!1d1000000!2d77.2090!3d28.6139!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!2m1!1spolling+booth+near+me!5e0!3m2!1sen!2sin!4v1700000000000" title="Find Polling Booth" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>`;
-      chatEl.appendChild(el); scroll();
-    }
-
-    /**
-     * Add response choice buttons
-     * @param {Array} choices - Array of {t, n} objects
-     */
-    function addChoices(choices) {
-      choicesEl.innerHTML = '';
-      choices.forEach((c, i) => {
-        const b = document.createElement('button'); b.className = 'ch'; b.textContent = c.t;
-        b.style.animationDelay = (i * .06) + 's'; b.setAttribute('aria-label', c.t);
-        b.addEventListener('click', async () => {
-          choicesEl.querySelectorAll('button').forEach(x => x.disabled = true); b.classList.add('sel');
-          const uw = document.createElement('div'); uw.className = 'msg user'; uw.setAttribute('role', 'article');
-          uw.innerHTML = '<div class="msg-av" aria-hidden="true">You</div><div class="bub"></div>';
-          uw.querySelector('.bub').textContent = c.t; chatEl.appendChild(uw); scroll();
-          await sleep(300); choicesEl.innerHTML = ''; await sleep(150); showNode(c.n);
-        });
-        choicesEl.appendChild(b);
-      });
-      // Focus first choice for keyboard accessibility
-      if (choices.length > 0) setTimeout(() => choices[0] && choicesEl.querySelector('.ch')?.focus(), 100);
-    }
-
-    /** Add quick action buttons below choices */
-    function addQuickActions() {
-      const existing = document.querySelector('.qa'); if (existing) existing.remove();
-      const qa = t('qa'); if (!qa || !qa.length) return;
-      const wrap = document.createElement('div'); wrap.className = 'qa'; wrap.setAttribute('role', 'toolbar'); wrap.setAttribute('aria-label', 'Quick actions');
-      qa.forEach((label) => {
-        const b = document.createElement('button'); b.className = 'qa-btn'; b.textContent = label; b.setAttribute('aria-label', label);
-        b.addEventListener('click', () => handleQuery(label)); wrap.appendChild(b);
-      });
-      choicesEl.parentElement.insertBefore(wrap, choicesEl);
-    }
-
-    /**
-     * Navigate to a conversation node
-     * @param {string} id - Node identifier
-     */
-    async function showNode(id) {
-      const node = C[id]; if (!node) return;
-      updProg(node.step);
-      const msgs = getMsg(node);
-      for (const m of msgs) await addMsg(m);
-      if (node.ytEmbed) addYouTubeEmbed(node.ytEmbed);
-      if (node.mapsEmbed) addMapsEmbed();
-      if (node.card) addCard(node.card);
-      if (node.celebrate) celebrate();
-      addChoices(getChoices(node));
-      addQuickActions();
-    }
-
-    /* ============================================================
-       SECTION 10: GOOGLE GEMINI AI INTEGRATION
-       ============================================================ */
-
-    /**
-     * Gemini AI configuration
-     * Uses Google's Generative Language API for intelligent fallback
-     * when keyword matching doesn't find a relevant node
-     */
-    const GEMINI = {
-      /** API endpoint — Gemini 1.5 Flash for fast responses */
-      endpoint: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent',
-
-      /** API key — stored in sessionStorage for security (user provides once) */
-      get apiKey() { return sessionStorage.getItem('navi_gemini_key') || ''; },
-      set apiKey(val) { sessionStorage.setItem('navi_gemini_key', val); },
-
-      /** System prompt that constrains Gemini to election topics */
-      systemPrompt: `You are Navi, an Indian Election Guide assistant. You ONLY answer questions about Indian elections, voting, ECI (Election Commission of India), Voter ID, electoral rolls, EVM, VVPAT, NOTA, polling booths, election dates, voter registration, and democratic processes in India.
-
-Rules:
-- Keep responses concise (under 150 words)
-- Be factual and nonpartisan
-- Always recommend verifying with official ECI sources (eci.gov.in, voters.eci.gov.in)
-- Mention relevant ECI forms (Form 6, 8, 8A, 6B, 6A) when applicable
-- Reference the Voter Helpline 1950 for urgent issues
-- If asked about non-election topics, politely redirect to election-related questions
-- Respond in the same language as the user's question when possible
-- Use simple, accessible language that all voters can understand`,
-
-      /** Whether Gemini is available (has API key) */
-      get isAvailable() { return !!this.apiKey; },
-
-      /** Maximum tokens for response */
-      maxTokens: 300,
-
-      /** Temperature for balanced responses */
-      temperature: 0.4
-    };
-
-    /**
-     * Prompt user for Gemini API key (one-time per session)
-     * @returns {boolean} Whether key was provided
-     */
-    function promptApiKey() {
-      if (GEMINI.isAvailable) return true;
-
-      const key = prompt(
-        'To enable AI-powered answers, enter your Google Gemini API key.\n\n' +
-        'Get a free key at: https://aistudio.google.com/apikey\n\n' +
-        '(Skip to use the standard guide without AI)'
-      );
-
-      if (key && key.trim().length > 10) {
-        GEMINI.apiKey = key.trim();
-        return true;
-      }
-      return false;
-    }
-
-    /**
-     * Query Google Gemini AI for election-related questions
-     * Falls back gracefully if API is unavailable
-     * 
-     * @param {string} query - User's question
-     * @param {string} lang - Current language code
-     * @returns {Promise<string|null>} AI response or null on failure
-     */
-    async function queryGemini(query, lang) {
-      if (!GEMINI.isAvailable && !promptApiKey()) return null;
-
-      try {
-        const langName = LANGS.find(l => l.code === lang)?.latin || 'English';
-
-        const response = await fetch(`${GEMINI.endpoint}?key=${GEMINI.apiKey}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            systemInstruction: {
-              parts: [{ text: GEMINI.systemPrompt + `\n\nRespond in ${langName} language.` }]
-            },
-            contents: [{
-              parts: [{ text: query }]
-            }],
-            generationConfig: {
-              maxOutputTokens: GEMINI.maxTokens,
-              temperature: GEMINI.temperature
-            }
-          })
-        });
-
-        if (!response.ok) {
-          console.warn('Gemini API error:', response.status);
-          return null;
-        }
-
-        const data = await response.json();
-        const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-
-        return text || null;
-      } catch (e) {
-        console.warn('Gemini query failed:', e.message);
-        return null;
-      }
-    }
-
-    /* ============================================================
-       SECTION 11: QUERY MATCHING ENGINE (UPGRADED)
-       ============================================================ */
-
-    /**
-     * Process user free-text query with three-tier resolution:
-     * 1. Local keyword matching (instant, no API)
-     * 2. Gemini AI fallback (intelligent, requires API key)
-     * 3. Static fallback (always available)
-     * 
-     * @param {string} raw - User input text
-     */
-    async function handleQuery(raw) {
-      const q = raw.toLowerCase().trim();
-
-      // Sanitize input — prevent XSS
-      const sanitized = q.replace(/[<>]/g, '');
-      if (sanitized.length === 0) return;
-
-      // TIER 1: Local keyword matching (instant)
-      const map = QMAP[curLang] || {};
-      const enMap = QMAP.en || {};
-
-      for (const [kw, node] of Object.entries(map)) {
-        if (sanitized.includes(kw)) { navigateTo(node, raw); return; }
-      }
-      for (const [kw, node] of Object.entries(enMap)) {
-        if (sanitized.includes(kw)) { navigateTo(node, raw); return; }
-      }
-
-      // TIER 2: Gemini AI (if available)
-      const aiResponse = await queryGemini(raw, curLang);
-      if (aiResponse) {
-        addAIResponse(raw, aiResponse);
-        return;
-      }
-
-      // TIER 3: Static fallback
-      addAgentFallback(raw);
-    }
-
-    /** Navigate to a conversation node from user query */
-    function navigateTo(nodeId, raw) {
-      const uw = document.createElement('div');
-      uw.className = 'msg user';
-      uw.setAttribute('role', 'article');
-      uw.innerHTML = '<div class="msg-av" aria-hidden="true">You</div><div class="bub"></div>';
-      uw.querySelector('.bub').textContent = raw;
-      chatEl.appendChild(uw);
-      scroll();
-      choicesEl.innerHTML = '';
-      setTimeout(() => showNode(nodeId), 300);
-    }
-
-    /**
-     * Display AI-generated response with source attribution
-     * @param {string} raw - Original user query
-     * @param {string} response - Gemini AI response text
-     */
-    async function addAIResponse(raw, response) {
-      // Add user message
-      const uw = document.createElement('div');
-      uw.className = 'msg user';
-      uw.setAttribute('role', 'article');
-      uw.innerHTML = '<div class="msg-av" aria-hidden="true">You</div><div class="bub"></div>';
-      uw.querySelector('.bub').textContent = raw;
-      chatEl.appendChild(uw);
-      scroll();
-      choicesEl.innerHTML = '';
-
-      // Add AI response with attribution
-      await addMsg(response + '\n\n_[AI-generated — verify with ECI at eci.gov.in]_');
-
-      // Offer to continue guided journey
-      addChoices(getChoices(C.welcome));
-      addQuickActions();
-    }
-
-    /** Show fallback when both keyword matching and AI fail */
-    async function addAgentFallback(raw) {
-      const uw = document.createElement('div');
-      uw.className = 'msg user';
-      uw.setAttribute('role', 'article');
-      uw.innerHTML = '<div class="msg-av" aria-hidden="true">You</div><div class="bub"></div>';
-      uw.querySelector('.bub').textContent = raw;
-      chatEl.appendChild(uw);
-      scroll();
-      choicesEl.innerHTML = '';
-
-      const fallbacks = {
-        en: "I'm not sure I understood. Try asking about registration, voter ID, electoral roll, polling booth, documents, EVM, NOTA, NRI voting, Aadhaar linking, or election dates. Or use the quick action buttons!\n\n💡 **Tip:** Enable AI mode (click the ✦ button) for intelligent answers to any election question.",
-        hi: "मुझे समझ नहीं आया। पंजीकरण, वोटर ID, मतदाता सूची, मतदान केंद्र, दस्तावेज, EVM, NOTA, NRI मतदान, आधार लिंक, या चुनाव तारीख के बारे में पूछें।\n\n💡 **सुझाव:** किसी भी चुनाव प्रश्न के लिए AI मोड (✦ बटन) सक्षम करें।",
-        kn: "ನನಗೆ ಅರ್ಥವಾಗಲಿಲ್ಲ. ನೋಂದಣಿ, ವೋಟರ್ ID, ಮತದಾರ ಪಟ್ಟಿ, ಮತಗಟ್ಟೆ, EVM, NOTA ಬಗ್ಗೆ ಕೇಳಿ.\n\n💡 AI ಮೋಡ್ ಸಕ್ರಿಯಗೊಳಿಸಿ (✦ ಬಟನ್).",
-        ta: "புரியவில்லை. பதிவு, வாக்காளர் ID, வாக்காளர் பட்டியல், EVM, NOTA பற்றி கேளுங்கள்.\n\n💡 AI பயன்முறையை இயக்கவும் (✦ பொத்தான்).",
-        te: "అర్థం కాలేదు. నమోదు, ఓటర్ ID, ఓటరు జాబಿತా, EVM, NOTA గురించి అడగండి.\n\n💡 AI మోడ్ ప్రారంభించండి (✦ బటన్).",
-        ml: "മനസ്സിലായില്ല. രജിസ്ട്രേഷൻ, വോട്ടർ ID, EVM, NOTA എന്നിവയെക്കുറിച്ച് ചോദിക്കൂ.\n\n💡 AI മോഡ് പ്രവർത്തനക്ഷമമാക്കുക (✦ ബട്ടൺ)."
-      };
-
-      await addMsg(fallbacks[curLang] || fallbacks.en);
-      addChoices(getChoices(C.welcome));
-      addQuickActions();
-    }
-
-    /* ============================================================
-       SECTION 12: EVENT LISTENERS (UPGRADED)
-       ============================================================ */
-
-    // Add AI toggle button to header
-    (function () {
-      const aiBtn = document.createElement('button');
-      aiBtn.className = 'h-btn';
-      aiBtn.id = 'aiTog';
-      aiBtn.title = 'Toggle AI mode (Gemini)';
-      aiBtn.setAttribute('aria-label', 'Toggle AI mode');
-      aiBtn.textContent = '✦';
-      aiBtn.style.cssText = 'font-size:.9rem';
-      aiBtn.addEventListener('click', () => {
-        if (GEMINI.isAvailable) {
-          // Toggle AI indicator
-          aiBtn.classList.toggle('active');
-          aiBtn.title = aiBtn.classList.contains('active') ? 'AI mode ON' : 'AI mode OFF';
-        } else {
-          promptApiKey();
-          if (GEMINI.isAvailable) aiBtn.classList.add('active');
-        }
-      });
-      // Insert before language button
-      const ctrls = document.querySelector('.h-ctrls');
-      if (ctrls) ctrls.insertBefore(aiBtn, ctrls.firstChild);
-    })();
-
-    voiceBtn.addEventListener('click', () => { isRecording ? stopRecording() : startRecording(); });
-    voiceTog.addEventListener('click', () => {
-      voiceOn = !voiceOn;
-      voiceTog.classList.toggle('active', voiceOn);
-      voiceTog.textContent = voiceOn ? '🔊' : '🔇';
-      voiceTog.setAttribute('aria-pressed', voiceOn);
-      if (!voiceOn && synth) synth.cancel();
-    });
-    langBtn.addEventListener('click', () => {
-      document.getElementById('chatScreen').classList.remove('active');
-      setTimeout(() => {
-        document.getElementById('langSel').classList.remove('exit');
-        curProg = 0;
-        chatEl.innerHTML = '';
-        choicesEl.innerHTML = '';
-        updProg(0);
-      }, 400);
-    });
-    sendBtn.addEventListener('click', () => {
-      const v = userInp.value.trim();
-      if (v) { userInp.value = ''; handleQuery(v); }
-    });
-    userInp.addEventListener('keydown', e => {
-      if (e.key === 'Enter') {
-        const v = userInp.value.trim();
-        if (v) { userInp.value = ''; handleQuery(v); }
-      }
-    });
-
-    /* ============================================================
-       SECTION 13: CELEBRATION (UNCHANGED)
-       ============================================================ */
-
-    function celebrate() {
-      const c = document.getElementById('cele');
-      c.classList.add('on');
-      const colors = ['#ff9933', '#FFFFFF', '#138808', '#d4a84b', '#f0d878', '#5b8def'];
-      for (let i = 0; i < 100; i++) {
-        const d = document.createElement('div');
-        d.className = 'conf';
-        d.setAttribute('aria-hidden', 'true');
-        d.style.cssText = `left:${Math.random() * 100}%;background:${colors[i % 6]};animation-delay:${Math.random() * 2.5}s;animation-duration:${2.5 + Math.random() * 2.5}s;width:${4 + Math.random() * 7}px;height:${4 + Math.random() * 7}px;border-radius:${Math.random() > .5 ? '50%' : '2px'}`;
-        c.appendChild(d);
-      }
-      const m = document.createElement('div');
-      m.className = 'cele-m';
-      m.setAttribute('role', 'dialog');
-      m.setAttribute('aria-label', 'Journey Complete');
-      const ct = {
-        en: '<h2>Jai Hind! 🇮🇳</h2><p>You\'re prepared for the world\'s largest democracy. Go vote!</p>',
-        hi: '<h2>जय हिंद! 🇮🇳</h2><p>आप विश्व के सबसे बड़े लोकतंत्र के लिए तैयार हैं। वोट करें!</p>'
-      };
-      m.innerHTML = (ct[curLang] || ct.en) + '<button onclick="this.closest(\'.cele-m\').remove();document.getElementById(\'cele\').classList.remove(\'on\')" autofocus>OK</button>';
-      c.appendChild(m);
-      setTimeout(() => { c.classList.remove('on'); c.innerHTML = ''; }, 12000);
-    }
-
-    /* ============================================================
-       SECTION 14: INITIALIZATION
-       ============================================================ */
-
-    initSTT();
-    if (synth) synth.onvoiceschanged = () => { };
-
-    // Load Google Translate script asynchronously
-    (function () {
-      const s = document.createElement('script');
-      s.src = '//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
-      s.async = true;
-      s.defer = true;
-      s.onerror = () => { /* Google Translate unavailable — graceful fallback */ };
-      document.head.appendChild(s);
-    })();
-
-    // Log initialization
-    console.log('%c🗳️ Navi — Indian Election Guide Agent v2.1', 'color:#ff9933;font-size:14px;font-weight:bold');
-    console.log('%c13 languages · Voice I/O · Gemini AI · 7 Google Services', 'color:#8891a5;font-size:11px');
-  </script>
+/** Bootstrap application */
+(function init() {
+  initSpeechRecognition();
+  
+  // Log initialization
+  console.log(
+    '%c🗳️ Navi v3.0 — Indian Election Guide Agent',
+    'color:#ff9933;font-size:14px;font-weight:bold'
+  );
+  console.log(
+    '%c13 languages · Voice I/O · Gemini AI · 7 Google Services · 81 Tests',
+    'color:#8891a5;font-size:11px'
+  );
+  
+  // Performance mark
+  if (window.performance) {
+    performance.mark('navi-init-complete');
+  }
+})();
+</script>
 </body>
-
 </html>

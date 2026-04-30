@@ -83,12 +83,11 @@ Each with proper Google Noto Sans fonts, native voice mapping, and fully localiz
 <td width="50%">
 
 ### 🧠 Smart Conversation Engine
-Not a chatbot with canned replies. A **branching decision tree** with 20+ nodes:
+Not a chatbot with canned replies. A **branching decision tree** with 31 nodes:
 
 - 5 personalized starting paths based on voter profile
 - Context-aware responses that adapt to your journey
-- Free-text query matching across all 13 languages
-- Graceful fallback when queries don't match
+- **Tiered Query Resolution**: Local Keywords → Google Gemini AI → Static Fallback
 - Progress tracking that persists through the conversation
 
 </td>
@@ -116,158 +115,34 @@ An agent should feel **alive**, not like a form:
 
 Not token links. Every Google service is woven naturally into the conversation flow:
 
-| Service | How It's Used | When It Appears |
-|---------|--------------|-----------------|
-| 🔍 **Google Search** | 10+ contextual deep links | Eligibility check, electoral roll, candidate research, form lookup, BLO finder |
-| 📍 **Google Maps** | Embedded map + polling booth search | Election Day preparation — "Find your polling booth" |
-| 📅 **Google Calendar** | One-click event creation with details | After preparation — "Add Election Day reminder" |
-| 📱 **Google Play Store** | App download links | Voter Helpline App, cVIGIL App — throughout journey |
-| 📺 **YouTube** | Embedded ECI videos | Research step — voter awareness, EVM/VVPAT demos |
-| 🌐 **Google Translate** | Page-level translation widget | Language selector — additional language support |
-| 🔤 **Google Fonts** | Noto Sans family (10+ scripts) | Everywhere — native Indian script rendering |
-
-```
-User: "How do I find my polling booth?"
-Navi:  → Shows embedded Google Maps
-       → Offers Google Maps deep link
-       → Mentions Voter Helpline App (Google Play)
-       → Offers to add reminder (Google Calendar)
-```
-
-<br>
-
----
-
-## 🗺️ The Journey
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                                                                 │
-│   🌐 Language Selection                                         │
-│      │                                                          │
-│      ▼                                                          │
-│   👤 "Where are you in your voting journey?"                    │
-│      ├── 🗳️ First-time voter ──────────┐                       │
-│      ├── 🔄 Returning voter ───────────┤                       │
-│      ├── 📦 Recently shifted ──────────┤                       │
-│      ├── 🌍 NRI / Overseas ────────────┤                       │
-│      └── 👀 Just exploring ────────────┤                       │
-│                                        ▼                        │
-│   ┌─────────────────────────────────────────────────────┐      │
-│   │  Step 0  ✓ Eligibility Check                        │      │
-│   │  Step 1  ✓ Voter ID Registration (Form 6)           │      │
-│   │  Step 2  ✓ Electoral Roll Verification              │      │
-│   │  Step 3  ✓ Candidate & Party Research               │      │
-│   │  Step 4  ✓ EVM/VVPAT & NOTA Understanding           │      │
-│   │  Step 5  ✓ Election Day Preparation                 │      │
-│   │  Step 6  ✓ Checklist & Rights                       │      │
-│   └─────────────────────────────────────────────────────┘      │
-│      │                                                          │
-│      ▼                                                          │
-│   🎉 Jai Hind! You're ready to vote.                           │
-│      (Indian tricolor confetti) 🟠⬜🟢                          │
-│                                                                 │
-└─────────────────────────────────────────────────────────────────┘
-```
-
-At **any point**, the user can:
-- Type a free-text question in any language
-- Speak a question using voice input
-- Use quick action buttons
-- Switch language
-- Toggle voice output
-
-<br>
-
----
-
-## 🏛️ ECI Integration
-
-Every piece of election information is sourced from or linked to official Election Commission of India resources:
-
-| ECI Resource | How Navi Uses It |
-|-------------|-----------------|
-| **Voter Portal** (voters.eci.gov.in) | Registration, verification, correction — all linked |
-| **Form 6** | New voter registration — explained step by step |
-| **Form 8** | Corrections — guided with context |
-| **Form 8A** | Migration — for users who shifted residence |
-| **Form 6B** | Aadhaar linking — benefits explained |
-| **Form 6A** | NRI voter registration — full process |
-| **Voter Helpline App** | Google Play link + feature explanation |
-| **cVIGIL App** | Violation reporting — with 100-min response promise |
-| **Voter Helpline 1950** | Click-to-call integration |
-| **ECINet Portal** | 40+ ECI apps — referenced |
-| **MyNeta.info** | Candidate records — linked for research |
-
-<br>
-
----
-
-## 🛡️ Security
-
-```
-✅ Input sanitization — XSS prevention on all user queries
-✅ rel="noopener noreferrer" — on every external link
-✅ Content Security Policy — upgrade-insecure-requests
-✅ Zero data collection — everything runs client-side
-✅ No analytics, no tracking, no cookies
-✅ No third-party scripts except Google services
-✅ All Google service links use official APIs/URLs
-```
-
-<br>
-
----
-
-## ♿ Accessibility
-
-Built for **every** Indian voter:
-
-```
-✅ WCAG 2.1 AA compliance
-✅ Skip navigation link
-✅ ARIA labels, roles, and live regions throughout
-✅ Full keyboard navigation (Tab, Enter, Space, Escape)
-✅ Screen reader compatible with semantic HTML
-✅ prefers-reduced-motion — disables animations
-✅ prefers-contrast: high — enhanced borders and text
-✅ Focus indicators on all interactive elements
-✅ sr-only labels for screen readers
-✅ Language attribute updates dynamically per selection
-✅ RTL support for Urdu (dir="ltr" with Urdu-aware layout)
-✅ Minimum touch target sizes (42px buttons)
-```
+| Service | How It's Used |
+|---------|--------------|
+| 🔍 **Google Search** | 10+ contextual deep links for eligibility, electoral roll, candidate research |
+| 📍 **Google Maps** | Embedded map + polling booth search for Election Day preparation |
+| 📅 **Google Calendar** | One-click event creation for Election Day reminders |
+| 📱 **Google Play Store** | App download links for Voter Helpline App and cVIGIL App |
+| 📺 **YouTube** | Embedded ECI awareness videos and EVM/VVPAT demos |
+| 🌐 **Google Gemini AI** | Advanced conversational engine for free-text election queries |
+| 🔤 **Google Fonts** | Noto Sans family for 10+ native Indian scripts |
 
 <br>
 
 ---
 
 ## 🧪 Testing
+Navi includes a built-in automated test suite (`tests.html`) with **95+ validation cases**:
 
-### Manual Testing Checklist
-
-| Test Case | Expected Behavior | Status |
-|-----------|------------------|--------|
-| Language selection | All 13 cards render with native scripts | ✅ |
-| Conversation branching | Each path leads to correct nodes | ✅ |
-| Free-text query (English) | Keywords route to correct nodes | ✅ |
-| Free-text query (Hindi) | Hindi keywords match correctly | ✅ |
-| Voice input | Mic activates, transcript appears | ✅ |
-| Voice output | Agent reads messages aloud | ✅ |
-| Google Maps embed | Map loads with polling booth search | ✅ |
-| YouTube embed | Video plays inline | ✅ |
-| Google Calendar link | Calendar event pre-fills correctly | ✅ |
-| Google Play links | App pages open in new tab | ✅ |
-| Progress ring | Updates correctly per step | ✅ |
-| Journey dots | Active/done states update | ✅ |
-| Celebration | Tricolor confetti on completion | ✅ |
-| Language switch | Returns to language selector | ✅ |
-| Keyboard navigation | Tab through all elements | ✅ |
-| Screen reader | ARIA labels read correctly | ✅ |
-| Mobile responsive | All layouts adapt to small screens | ✅ |
-| Reduced motion | Animations disabled | ✅ |
-| Input sanitization | Script tags stripped from queries | ✅ |
-| External links | All open with noopener noreferrer | ✅ |
+| Suite | Focus Area | Status |
+|-------|------------|--------|
+| 🌐 Languages | 13 Indian languages & native scripts | ✅ |
+| 🌳 Conversation | 31-node branching integrity | ✅ |
+| 🔍 Query Engine | Multilingual keyword matching | ✅ |
+| 🔗 Google Services | Search, Maps, Calendar, Play, YouTube, Translate, Fonts, Gemini | ✅ |
+| 🛡️ Security | XSS prevention, CSP, sanitization | ✅ |
+| ♿ Accessibility | WCAG 2.1 AA, keyboard nav, ARIA, high contrast | ✅ |
+| 🎤 Voice System | STT/TTS initialization & state | ✅ |
+| 🧠 Gemini AI | 3-tier fallback & AI resolution | ✅ |
+| ⚡ Performance | DOM batching & animation optimization | ✅ |
 
 ### Browser Compatibility
 
@@ -289,65 +164,12 @@ Built for **every** Indian voter:
 ```
 navi-election-guide/
 │
-├── index.html              ← Complete application (~95KB)
-│   ├── Section 1:  Initialization & Utilities
-│   ├── Section 2:  Language Definitions (13 languages)
-│   ├── Section 3:  UI Translations
-│   ├── Section 4:  Conversation Engine Data (20+ nodes)
-│   ├── Section 5:  Query Keyword Matching Engine
-│   ├── Section 6:  DOM References & State
-│   ├── Section 7:  Journey Bar Setup
-│   ├── Section 8:  Language Selector
-│   ├── Section 9:  Chat Engine
-│   ├── Section 10: Query Processing
-│   ├── Section 11: Voice System (Web Speech API)
-│   ├── Section 12: Event Listeners
-│   ├── Section 13: Celebration System
-│   └── Section 14: Initialization
-│
-└── README.md               ← You are here
+├── index.html              ← Complete application v3.0 (~125KB)
+├── tests.html              ← Automated 95-test suite
+└── README.md               ← Documentation
 ```
 
 **Zero dependencies. Zero build steps. Zero servers.**
-
-Open `index.html` in a browser. That's it.
-
-<br>
-
----
-
-## 🎯 Design Philosophy
-
-### Why a conversational agent, not a website?
-
-Because elections are **personal**. A first-time voter in Kerala has completely different needs from an NRI in London or a returning voter in Punjab. A website shows everyone the same page. An agent **asks, adapts, and guides**.
-
-### Why 13 languages?
-
-Because India doesn't speak one language. The ECI conducts elections in **multiple official languages**. A voter who thinks in Tamil shouldn't have to process English to exercise their democratic right. Navi doesn't just translate — it **thinks** in your language.
-
-### Why voice?
-
-Because **literacy shouldn't be a barrier to democracy**. Voice input lets users ask questions by speaking. Voice output reads guidance aloud. This is especially important for elderly voters and first-time participants.
-
-### Why Google Services?
-
-Because voters already live in Google's ecosystem. They search on Google, navigate with Maps, schedule on Calendar, download apps from Play Store, and watch videos on YouTube. Meeting voters where they already are — rather than asking them to learn a new platform — is how you reach 97 crore people.
-
-<br>
-
----
-
-## 📜 Assumptions
-
-1. **Scope** — Primarily covers Lok Sabha General Elections; State Assembly elections follow similar processes with minor variations
-2. **Dates** — Election dates shown are illustrative; actual dates are announced by ECI before each election cycle
-3. **Browser** — Voice features require Chromium-based browsers; graceful degradation for others
-4. **Connectivity** — Google Services integration requires active internet connection
-5. **Privacy** — Zero data collection; all processing happens in the browser
-6. **Neutrality** — Strictly nonpartisan; no political party is mentioned, endorsed, or criticized
-7. **Accuracy** — All ECI information is based on publicly available official resources; users should verify with eci.gov.in for the latest updates
-8. **Postal Ballot** — Simplified; eligibility criteria are subject to ECI notifications per election
 
 <br>
 
@@ -357,31 +179,17 @@ Because voters already live in Google's ecosystem. They search on Google, naviga
 
 | Requirement | Implementation |
 |------------|---------------|
-| Smart, dynamic assistant | 20+ conversation nodes with branching logic and context awareness |
-| Logical decision making | User profile → personalized path → step-by-step guidance |
-| Google Services | 7 services deeply integrated (Search, Maps, Calendar, Play, YouTube, Translate, Fonts) |
-| Practical usability | Real election information for real voters in real languages |
-| Clean code | 14 clearly labeled sections with JSDoc comments |
-| Security | Input sanitization, CSP, noopener, zero data collection |
-| Efficiency | Single HTML file, <100KB, no dependencies, no server |
-| Testing | 20+ test cases with browser compatibility matrix |
-| Accessibility | WCAG 2.1 AA, ARIA, keyboard nav, screen reader, reduced motion |
-| Repository < 10MB | ~95KB total |
-| Single branch | `main` only |
+| Smart, dynamic assistant | 31-node branching logic with Gemini AI integration |
+| Logical decision making | Context-aware journey mapping & state persistence |
+| Google Services | 7 services deeply integrated (Gemini, Search, Maps, Calendar, Play, YouTube, Fonts) |
+| Practical usability | Real-world election data & ECI process alignment |
+| Clean code | 15 labeled sections with JSDoc, strict mode, & architectural optimizations |
+| Security | Full CSP, input sanitization, zero PII collection |
+| Efficiency | Single-file architecture, DocumentFragment batching, will-change optimization |
+| Testing | 95+ automated tests via `tests.html` |
+| Accessibility | WCAG 2.1 AA, high-contrast support, screen reader optimized |
+| Repository < 10MB | ~125KB total |
 | Public repository | ✅ |
-| README | This document |
-
-<br>
-
----
-
-## 🙏 Acknowledgments
-
-- **Election Commission of India** — For making election information publicly accessible
-- **Google** — For Fonts, Translate, Maps, Search, YouTube, Calendar, and Play Store APIs
-- **ADR / MyNeta** — For candidate transparency data
-- **Web Speech API** — For making voice accessible in the browser
-- **97 Crore+ Indian Voters** — The reason this exists
 
 <br>
 
